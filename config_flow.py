@@ -5,7 +5,8 @@ from types import MappingProxyType
 from typing import Any
 import uuid
 
-from pygryfsmart.rs232 import RS232Handler
+from pygryfsmart import GryfApi
+
 from serial import SerialException
 import voluptuous as vol
 
@@ -36,10 +37,10 @@ _LOGGER = logging.getLogger(__name__)
 
 async def ping_connection(port) -> bool:
     """Test connection."""
-    writer = RS232Handler(port, 115200)
+    writer = GryfApi(port, 115200)
     try:
-        await writer.open_connection()
-        await writer.close_connection()
+        await writer.start_connection()
+        await writer.stop_connection()
         return True
     except SerialException as e:
         _LOGGER.error("%s", e)
@@ -72,8 +73,6 @@ class GryfSmartConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         if user_input:
             if not await ping_connection(user_input.get(CONF_PORT)):
                 errors[CONF_PORT] = "Unable to connect"
-            elif not user_input.get(CONF_PORT, "").startswith("/dev/"):
-                errors[CONF_PORT] = "invalid_port"
             else:
                 self._config_data = {
                     CONF_COMMUNICATION: {},
@@ -407,8 +406,6 @@ class GryfSmartOptionsFlow(config_entries.OptionsFlow):
         if user_input:
             if not await ping_connection(user_input.get(CONF_PORT)):
                 errors[CONF_PORT] = "Unable to connect"
-            elif not user_input.get(CONF_PORT, "").startswith("/dev/"):
-                errors[CONF_PORT] = "invalid_port"
             else:
                 self.data[CONF_COMMUNICATION][CONF_PORT] = user_input[CONF_PORT]
                 self.data[CONF_COMMUNICATION][CONF_MODULE_COUNT] = user_input[
