@@ -9,5 +9,6 @@
   "quality_scale": "bronze",
   "requirements": ["pygryfsmart==0.1.8"],
   "ssdp": [],
-  "zeroconf": []
+  "zeroconf": [],
+  "version": "1.0.0"
 }
