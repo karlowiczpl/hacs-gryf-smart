@@ -1,0 +1,9 @@
+{
+  "name": "GryfSmart",
+  "content_in_root": false,
+  "domains": ["sensor", "binary_sensor", "switch", "light"],
+  "country": "PL",
+  "homeassistant": "2024.4.4",
+  "iot_class": "local_pushing"
+}
+
