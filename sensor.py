@@ -2,10 +2,10 @@
 
 from pygryfsmart.device import (
     _GryfDevice,
-    _GryfInput,
-    _GryfInputLine,
-    _GryfOutputLine,
-    _GryfTemperature,
+    GryfInput,
+    GryfInputLine,
+    GryfOutputLine,
+    GryfTemperature,
 )
 
 from homeassistant.components.sensor import SensorDeviceClass, SensorEntity
@@ -41,7 +41,7 @@ async def async_setup_platform(
     async_add_entities(
         [
             GryfYamlLine(
-                _GryfInputLine(
+                GryfInputLine(
                     GRYF_IN_NAME,
                     hass.data[DOMAIN][CONF_API],
                 ),
@@ -52,7 +52,7 @@ async def async_setup_platform(
     async_add_entities(
         [
             GryfYamlLine(
-                _GryfOutputLine(
+                GryfOutputLine(
                     GRYF_OUT_NAME,
                     hass.data[DOMAIN][CONF_API],
                 ),
@@ -64,7 +64,7 @@ async def async_setup_platform(
     inputs = []
 
     for conf in hass.data[DOMAIN].get(PLATFORM_INPUT, {}):
-        device = _GryfInput(
+        device = GryfInput(
             conf.get(CONF_NAME),
             conf.get(CONF_ID) // 10,
             conf.get(CONF_ID) % 10,
@@ -84,7 +84,7 @@ async def async_setup_entry(
     async_add_entities(
         [
             GryfConfigFlowLine(
-                _GryfInputLine(
+                GryfInputLine(
                     GRYF_IN_NAME,
                     config_entry.runtime_data[CONF_API],
                 ),
@@ -96,7 +96,7 @@ async def async_setup_entry(
     async_add_entities(
         [
             GryfConfigFlowLine(
-                _GryfOutputLine(
+                GryfOutputLine(
                     GRYF_OUT_NAME,
                     config_entry.runtime_data[CONF_API],
                 ),
@@ -111,7 +111,7 @@ async def async_setup_entry(
 
     for conf in config_entry.data[CONF_DEVICES]:
         if conf.get(CONF_TYPE) == PLATFORM_INPUT:
-            device = _GryfInput(
+            device = GryfInput(
                 conf.get(CONF_NAME),
                 conf.get(CONF_ID) // 10,
                 conf.get(CONF_ID) % 10,
@@ -119,7 +119,7 @@ async def async_setup_entry(
             )
             inputs.append(GryfConfigFlowInput(device, config_entry))
         if conf.get(CONF_TYPE) == PLATFORM_TEMPERATURE:
-            temperature_device = _GryfTemperature(
+            temperature_device = GryfTemperature(
                 conf.get(CONF_NAME),
                 conf.get(CONF_ID) // 10,
                 conf.get(CONF_ID) % 10,

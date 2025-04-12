@@ -1,6 +1,6 @@
 """Handle the Gryf Smart binary sensor platform functionality."""
 
-from pygryfsmart.device import _GryfDevice, _GryfInput
+from pygryfsmart.device import _GryfDevice, GryfInput
 
 from homeassistant.components.binary_sensor import (
     BinarySensorDeviceClass,
@@ -36,7 +36,7 @@ async def async_setup_platform(
     binary_sensors = []
 
     for conf in hass.data[DOMAIN].get(PLATFORM_BINARY_SENSOR, {}):
-        device = _GryfInput(
+        device = GryfInput(
             conf.get(CONF_NAME),
             conf.get(CONF_ID) // 10,
             conf.get(CONF_ID) % 10,
@@ -58,7 +58,7 @@ async def async_setup_entry(
 
     for conf in config_entry.data[CONF_DEVICES]:
         if conf.get(CONF_TYPE) == Platform.BINARY_SENSOR:
-            device = _GryfInput(
+            device = GryfInput(
                 conf.get(CONF_NAME),
                 conf.get(CONF_ID) // 10,
                 conf.get(CONF_ID) % 10,

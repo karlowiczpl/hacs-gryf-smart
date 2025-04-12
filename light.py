@@ -2,7 +2,7 @@
 
 from typing import Any
 
-from pygryfsmart.device import _GryfDevice, _GryfOutput, _GryfPwm
+from pygryfsmart.device import _GryfDevice, GryfOutput, GryfPwm
 
 from homeassistant.components.light import ColorMode, LightEntity
 from homeassistant.config_entries import ConfigEntry
@@ -27,7 +27,7 @@ async def async_setup_platform(
     pwm = []
 
     for conf in hass.data[DOMAIN].get(Platform.LIGHT, {}):
-        device = _GryfOutput(
+        device = GryfOutput(
             conf.get(CONF_NAME),
             conf.get(CONF_ID) // 10,
             conf.get(CONF_ID) % 10,
@@ -36,7 +36,7 @@ async def async_setup_platform(
         lights.append(GryfYamlLight(device))
 
     for conf in hass.data[DOMAIN].get(PLATFORM_PWM, {}):
-        device = _GryfPwm(
+        device = GryfPwm(
             conf.get(CONF_NAME),
             conf.get(CONF_ID) // 10,
             conf.get(CONF_ID) % 10,
@@ -59,7 +59,7 @@ async def async_setup_entry(
 
     for conf in config_entry.data[CONF_DEVICES]:
         if conf.get(CONF_TYPE) == Platform.LIGHT:
-            device = _GryfOutput(
+            device = GryfOutput(
                 conf.get(CONF_NAME),
                 conf.get(CONF_ID) // 10,
                 conf.get(CONF_ID) % 10,
@@ -67,7 +67,7 @@ async def async_setup_entry(
             )
             lights.append(GryfConfigFlowLight(device, config_entry))
         elif conf.get(CONF_TYPE) == PLATFORM_PWM:
-            device = _GryfPwm(
+            device = GryfPwm(
                 conf.get(CONF_NAME),
                 conf.get(CONF_ID) // 10,
                 conf.get(CONF_ID) % 10,
