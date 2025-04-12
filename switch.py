@@ -3,7 +3,7 @@
 from typing import Any
 
 from homeassistant.components import switch
-from pygryfsmart.device import _GryfDevice , _GryfOutput
+from pygryfsmart.device import _GryfDevice , GryfOutput
 
 from homeassistant.components.switch import SwitchEntity , SwitchDeviceClass
 from homeassistant.config_entries import ConfigEntry
@@ -26,7 +26,7 @@ async def async_setup_platform(
     switches = []
 
     for conf in hass.data[DOMAIN].get(PLATFORM_SWITCH):
-        device = _GryfOutput(
+        device = GryfOutput(
             conf.get(CONF_NAME),
             conf.get(CONF_ID) // 10,
             conf.get(CONF_ID) % 10,
@@ -46,7 +46,7 @@ async def async_setup_entry(
     switches = []
     for conf in config_entry.data[CONF_DEVICES]:
         if conf.get(CONF_TYPE) == Platform.SWITCH:
-            device = _GryfOutput(
+            device = GryfOutput(
                 conf.get(CONF_NAME),
                 conf.get(CONF_ID) // 10,
                 conf.get(CONF_ID) % 10,
