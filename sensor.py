@@ -74,7 +74,6 @@ async def async_setup_platform(
 
     async_add_entities(inputs)
 
-
 async def async_setup_entry(
     hass: HomeAssistant,
     config_entry: ConfigEntry,
