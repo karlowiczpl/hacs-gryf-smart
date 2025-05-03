@@ -1,9 +1,10 @@
 """Handle the Gryf Smart Switch platform functionality."""
 
 from typing import Any
+import asyncio
 
 from homeassistant.components import switch
-from pygryfsmart.device import _GryfDevice , GryfOutput
+from pygryfsmart.device import _GryfDevice , GryfOutput, GryfReset
 
 from homeassistant.components.switch import SwitchEntity , SwitchDeviceClass
 from homeassistant.config_entries import ConfigEntry
@@ -103,7 +104,7 @@ class GryfConfigFlowSwitch(GryfConfigFlowEntity , GryfSwitchBase):
 
         self._config_entry = config_entry
         super().__init__(config_entry , device)
-        self._device.subscribe(self.async_update)
+       self._device.subscribe(self.async_update)
 
         self._attr_device_class = SWITCH_DEVICE_CLASS[device_class]
 
@@ -115,11 +116,70 @@ class GryfYamlSwitch(GryfYamlEntity , GryfSwitchBase):
         self,
         device: _GryfDevice,
         device_class: str,
-                 ) -> None:
+    ) -> None:
         """Init the Gryf Switch."""
         
         super().__init__(device)
         self._device.subscribe(self.async_update)
 
         self._attr_device_class = SWITCH_DEVICE_CLASS[device_class]
+
+class GryfRSTBase(SwitchEntity):
+    """Gryf Smart MonoStable Switch base."""
+
+    _is_on = False
+    _device: GryfReset
+    _attr_device_class = SwitchDeviceClass.SWITCH
+
+    @property
+    def is_on(self):
+        """Property is on."""
+
+        return self._is_on
+
+    async def async_turn_on(self, **kwargs):
+        """Turn on switch."""
+
+        await self._device.reset_all()
+        self._is_on = True
+        self.async_write_ha_state()
+        await asyncio.sleep(2)
+
+        self._is_on = False
+        self.async_write_ha_state()
+
+    async def async_turn_off(self, **kwargs):
+        """Turn off switch."""
+
+        pass
+
+    async def async_toggle(self, **kwargs):
+        """Toggle switch"""
+
+        await self._device.reset_all()
+
+class GryfConfigFlowRST(GryfConfigFlowEntity, GryfRSTBase):
+    """Gryf smart config flow rst."""
+
+    _device: GryfReset
+
+    def __init__(
+            self,
+            config_entry: ConfigEntry,
+            device: GryfReset
+    ) -> None:
+        """Initailise gryfRST."""
+
+        super().__init__(config_entry, device)
+
+class GryfYamlRST(GryfYamlEntity, GryfRSTBase):
+    """Gryf Smart yaml reset."""
+
+    def __init__(
+        self,
+        device: GryfReset
+    ) -> None:
+        """Initialise GryfRST."""
+        
+        super().__init__(device)
 
