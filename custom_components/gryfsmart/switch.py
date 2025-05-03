@@ -104,7 +104,7 @@ class GryfConfigFlowSwitch(GryfConfigFlowEntity , GryfSwitchBase):
 
         self._config_entry = config_entry
         super().__init__(config_entry , device)
-       self._device.subscribe(self.async_update)
+        self._device.subscribe(self.async_update)
 
         self._attr_device_class = SWITCH_DEVICE_CLASS[device_class]
 
