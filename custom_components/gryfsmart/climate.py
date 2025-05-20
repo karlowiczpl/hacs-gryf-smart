@@ -152,6 +152,8 @@ class GryfClimteBase(ClimateEntity):
 
             self.async_write_ha_state()
 
+            self._device.update_out()
+
 class GryfConfigFlowClimate(GryfConfigFlowEntity, GryfClimteBase):
     """Gryf smart config flow climate class."""
 
