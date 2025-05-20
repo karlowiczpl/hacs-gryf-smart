@@ -3,7 +3,6 @@
 from typing import Any
 import asyncio
 
-from homeassistant.components.gryfsmart.entity import GryfConfigFlowEntity
 from pygryfsmart.device import _GryfDevice, GryfOutput
 
 from homeassistant.components.lock import LockEntity, LockEntityDescription, LockEntityFeature
