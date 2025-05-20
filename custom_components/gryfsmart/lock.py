@@ -12,6 +12,8 @@ from homeassistant.const import CONF_TYPE
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
 
+from .entity import GryfConfigFlowEntity, GryfYamlEntity
+
 from .const import (
     CONF_API,
     CONF_DEVICE_CLASS,
@@ -56,7 +58,7 @@ async def async_setup_entry(
                 conf.get(CONF_ID) % 10,
                 config_entry.runtime_data[CONF_API],
             )
-            locks.append(GryfCOnfigFlowLock(device, config_entry))
+            locks.append(GryfConfigFlowLock(device, config_entry))
 
     async_add_entities(locks)
 
@@ -88,7 +90,7 @@ class GryfLockBase(LockEntity):
 
         self.async_write_ha_state()
 
-class GryfCOnfigFlowLock(GryfConfigFlowEntity, GryfLockBase):
+class GryfConfigFlowLock(GryfConfigFlowEntity, GryfLockBase):
     
     def __init__(
         self,
