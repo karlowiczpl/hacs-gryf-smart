@@ -143,7 +143,6 @@ class GryfClimteBase(ClimateEntity):
         self._attr_preset_mode = preset_mode
         self.async_write_ha_state()
 
-
     async def async_set_temperature(self, **kwargs: Any) -> None:
 
         if ATTR_TEMPERATURE in kwargs:
