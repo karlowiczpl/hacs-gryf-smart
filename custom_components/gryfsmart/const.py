@@ -20,6 +20,9 @@ CONF_API = "api"
 CONF_DEVICE_DATA = "device_data"
 CONF_INPUTS = "input"
 CONF_DEVICE_CLASS = "device_class"
+CONF_GRYF_EXPERT = "gryf_expert"
+CONF_TEMP = "temp"
+CONF_OUT = "out"
 
 PLATFORM_PWM = "pwm"
 PLATFORM_TEMPERATURE = "temperature"
@@ -27,10 +30,19 @@ PLATFORM_INPUT = "input"
 PLATFORM_LIGHT = "light"
 PLATFORM_BINARY_SENSOR = "binary_sensor"
 PLATFORM_SWITCH = "output"
+PLATFORM_CLIMATE = "climate"
+PLATFORM_LOCK = "lock"
 
 DEFAULT_PORT = "/dev/ttyUSB0"
 GRYF_IN_NAME = "Gryf IN"
 GRYF_OUT_NAME = "Gryf OUT"
+
+NORMAL_HEATING_MODE = "away"
+SLOWEST_HEATING_MODE = "eco"
+THE_SLOWEST_HEATING_MODE = "sleep"
+
+SLOWEST_HEATING_MODE_DIFFERENTIAL = 1
+THE_SLOWEST_HEATING_MODE_DIFFERENTIAL = 1
 
 CONFIG_FLOW_MENU_OPTIONS = {
     "add_device": "Add Device",
@@ -41,12 +53,12 @@ CONFIG_FLOW_MENU_OPTIONS = {
 
 DEVICE_TYPES = {
     # Platform.COVER: "Shutter",
-    Platform.LIGHT: "Lights",
-    Platform.SWITCH: "Output",
+    PLATFORM_LIGHT: "Lights",
+    PLATFORM_SWITCH: "Output",
     # Platform.SENSOR: "Input",
-    Platform.BINARY_SENSOR: "Binary input",
-    # Platform.LOCK: "Lock",
-    # Platform.CLIMATE: "Thermostat",
+    PLATFORM_BINARY_SENSOR: "Binary input",
+    PLATFORM_LOCK: "Lock",
+    PLATFORM_CLIMATE: "Thermostat",
     PLATFORM_PWM: "PWM",
     PLATFORM_TEMPERATURE: "Termometr",
     PLATFORM_INPUT: "Input",

@@ -11,7 +11,6 @@ from serial import SerialException
 import voluptuous as vol
 
 from homeassistant import config_entries
-from homeassistant.const import Platform
 from homeassistant.core import callback
 from homeassistant.helpers import selector
 
@@ -29,6 +28,8 @@ from .const import (
     DEFAULT_PORT,
     DEVICE_TYPES,
     DOMAIN,
+    PLATFORM_BINARY_SENSOR,
+    PLATFORM_SWITCH,
     SWITCH_DEVICE_CLASS,
 )
 
@@ -430,17 +431,16 @@ class GryfSmartOptionsFlow(config_entries.OptionsFlow):
             errors=errors,
         )
 
-
 def check_extra_parameter(
     extra_parameter: Any | None,
     device_type: Any | None,
 ) -> str | None:
     """Check extra parameter."""
 
-    if device_type == Platform.BINARY_SENSOR:
+    if device_type == PLATFORM_BINARY_SENSOR:
         if not extra_parameter in BINARY_SENSOR_DEVICE_CLASS:
             return "Bad binary sensor extra parameter!"
-    if device_type == Platform.SWITCH:
+    elif device_type == PLATFORM_SWITCH:
         if not extra_parameter in SWITCH_DEVICE_CLASS:
             return "Bad Output extra parameter!"
             

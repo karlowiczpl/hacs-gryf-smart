@@ -1,6 +1,7 @@
 """Define the base entity for the Gryf Smart integration."""
 
 from __future__ import annotations
+from typing import Dict
 
 from pygryfsmart.api import GryfApi
 from pygryfsmart.device import _GryfDevice
@@ -55,6 +56,10 @@ class GryfConfigFlowEntity(_GryfSmartEntityBase):
         """Return unique_id."""
         return f"{self._device.name} {self._config_entry.unique_id}"
 
+    @property
+    def extra_state_attributes(self):
+        """Retrun extra state attributes."""
+        return self._device.extra_attributes
 
 class GryfYamlEntity(_GryfSmartEntityBase):
     """Gryf yaml entity class."""
@@ -71,3 +76,11 @@ class GryfYamlEntity(_GryfSmartEntityBase):
     def unique_id(self) -> str | None:
         """Return unique id."""
         return self._device.name
+
+    @property
+    def extra_state_attributes(self):
+        """Retrun extra state attributes."""
+        return {
+            "id": self._device._id,
+            "pin": self._device._pin
+        }

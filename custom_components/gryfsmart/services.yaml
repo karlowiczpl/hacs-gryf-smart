@@ -1,0 +1,44 @@
+reset:
+  name: Reset Device
+  decription: Reset the GryfSmart device
+  fields:
+    entry_id:
+      name: Entry ID
+      decription: The config entry ID of the device to reset
+      required: true
+      selector: 
+        config_entry:
+          integration: gryfsmart
+
+gryf_expert:
+  name: Gryf expert enable
+  decription: turning on gryf expert protocol
+  fields:
+    entry_id:
+      name: Entry ID
+      decription: The config entry ID of the device to reset
+      required: true
+      selector: 
+        config_entry:
+          integration: gryfsmart
+    action:
+      name: set action
+      description: Choose whether to turn expert mode on or off.
+      required: true
+      selector:
+        select:
+          options:
+            - "turn_on"
+            - "turn_off"
+
+search_modules:
+  name: GryfSmart search modules
+  decription: research all modules
+  fields:
+    entry_id:
+      name: Entry ID
+      decription: The config entry ID of the device to reset
+      required: true
+      selector: 
+        config_entry:
+          integration: gryfsmart
