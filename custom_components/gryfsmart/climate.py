@@ -147,12 +147,10 @@ class GryfClimteBase(ClimateEntity):
     async def async_set_temperature(self, **kwargs: Any) -> None:
 
         if ATTR_TEMPERATURE in kwargs:
-            self._device.set_target_temperature(kwargs[ATTR_TEMPERATURE])
+            await self._device.set_target_temperature(kwargs[ATTR_TEMPERATURE])
             self._attr_target_temperature = kwargs[ATTR_TEMPERATURE]
 
             self.async_write_ha_state()
-
-            self._device.update_out()
 
 class GryfConfigFlowClimate(GryfConfigFlowEntity, GryfClimteBase):
     """Gryf smart config flow climate class."""
