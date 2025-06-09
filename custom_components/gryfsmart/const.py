@@ -23,6 +23,7 @@ CONF_DEVICE_CLASS = "device_class"
 CONF_GRYF_EXPERT = "gryf_expert"
 CONF_TEMP = "temp"
 CONF_OUT = "out"
+CONF_TIME = "time"
 
 PLATFORM_PWM = "pwm"
 PLATFORM_TEMPERATURE = "temperature"
@@ -32,6 +33,7 @@ PLATFORM_BINARY_SENSOR = "binary_sensor"
 PLATFORM_SWITCH = "output"
 PLATFORM_CLIMATE = "climate"
 PLATFORM_LOCK = "lock"
+PLATFORM_COVER = "cover"
 
 DEFAULT_PORT = "/dev/ttyUSB0"
 GRYF_IN_NAME = "Gryf IN"
@@ -52,7 +54,7 @@ CONFIG_FLOW_MENU_OPTIONS = {
 }
 
 DEVICE_TYPES = {
-    # Platform.COVER: "Shutter",
+    PLATFORM_COVER: "Shutter",
     PLATFORM_LIGHT: "Lights",
     PLATFORM_SWITCH: "Output",
     # Platform.SENSOR: "Input",
