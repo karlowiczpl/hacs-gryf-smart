@@ -47,7 +47,7 @@ CLIMATE_SCHEMA = vol.Schema(
 COVER_SCHEMA = vol.Schema(
     {
         vol.Required(CONF_NAME): cv.string,
-        vol.Required(CONF_OUT): cv.positive_int,
+        vol.Required(CONF_ID): cv.positive_int,
         vol.Required(CONF_TIME): cv.positive_int,
     }
 )
