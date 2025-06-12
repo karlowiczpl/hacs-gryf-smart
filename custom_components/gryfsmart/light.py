@@ -10,6 +10,7 @@ from homeassistant.const import CONF_TYPE, Platform
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
+from homeassistant.helpers.restore_state import RestoreEntity
 
 from .const import CONF_API, CONF_DEVICES, CONF_ID, CONF_NAME, DOMAIN, PLATFORM_PWM 
 from .entity import GryfConfigFlowEntity, GryfYamlEntity
@@ -79,7 +80,7 @@ async def async_setup_entry(
     async_add_entities(pwm)
 
 
-class GryfLightBase(LightEntity):
+class GryfLightBase(LightEntity, RestoreEntity):
     """Gryf Light entity base."""
 
     _is_on = False
@@ -93,10 +94,21 @@ class GryfLightBase(LightEntity):
 
         return self._is_on
 
+    async def async_added_to_hass(self) -> None:
+        await super().async_added_to_hass()
+
+        if(last_state := await self.async_get_last_state()) is not None:
+            self._attr_is_on = last_state.state == "on"
+
     async def async_update(self, is_on):
         """Update state."""
 
         self._is_on = is_on
+        if is_on:
+            self._attr_icon = "mdi:lightbulb"
+        else:
+            self._attr_icon = "mdi:lightbulb-off"
+
         self.async_write_ha_state()
 
     async def async_turn_on(self, **kwargs: Any) -> None:

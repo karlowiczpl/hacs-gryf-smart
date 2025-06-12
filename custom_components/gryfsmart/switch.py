@@ -12,6 +12,7 @@ from homeassistant.const import Platform , CONF_TYPE
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import ConfigType , DiscoveryInfoType
+from homeassistant.helpers.restore_state import RestoreEntity
 
 from .const import CONF_API, CONF_DEVICE_CLASS , CONF_DEVICES, CONF_EXTRA , CONF_ID , CONF_NAME , DOMAIN, PLATFORM_SWITCH, SWITCH_DEVICE_CLASS
 from .entity import GryfYamlEntity , GryfConfigFlowEntity
@@ -57,7 +58,7 @@ async def async_setup_entry(
 
     async_add_entities(switches)
     
-class GryfSwitchBase(SwitchEntity):
+class GryfSwitchBase(SwitchEntity, RestoreEntity):
     """Gryf Switch entity base."""
 
     _is_on = False
@@ -69,6 +70,12 @@ class GryfSwitchBase(SwitchEntity):
         """Property is on."""
 
         return self._is_on
+
+    async def async_added_to_hass(self) -> None:
+        await super().async_added_to_hass()
+
+        if(last_state := await self.async_get_last_state()) is not None:
+            self._attr_is_on = last_state.state == "on"
 
     async def async_update(self , is_on):
         """Update state."""
