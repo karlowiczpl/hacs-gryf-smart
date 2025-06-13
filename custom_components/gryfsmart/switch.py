@@ -1,9 +1,5 @@
 """Handle the Gryf Smart Switch platform functionality."""
 
-from typing import Any
-import asyncio
-
-from homeassistant.components import switch
 from pygryfsmart.device import _GryfDevice , GryfOutput
 
 from homeassistant.components.switch import SwitchEntity , SwitchDeviceClass
