@@ -114,7 +114,7 @@ class GryfSmartConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     async def async_step_add_device(
         self, user_input: dict[str, Any] | None = None
     ) -> config_entries.ConfigFlowResult:
-        """Add new device."""gitter
+        """Add new device."""
 
         errors = {}
         if user_input:
