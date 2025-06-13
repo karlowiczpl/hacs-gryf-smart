@@ -114,7 +114,7 @@ class GryfSmartConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     async def async_step_add_device(
         self, user_input: dict[str, Any] | None = None
     ) -> config_entries.ConfigFlowResult:
-        """Add new device."""
+        """Add new device."""gitter
 
         errors = {}
         if user_input:
@@ -130,9 +130,7 @@ class GryfSmartConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 check_extra_parameter(
                     user_input.get(CONF_EXTRA), user_input.get(CONF_TYPE)
                 )
-                is None
-            ):
-                return await self.async_step_device_menu()
+                is None): return await self.async_step_device_menu()
             errors[CONF_TYPE] = "Bad binary sensor extra parameter!"
 
         return self.async_show_form(
@@ -244,8 +242,9 @@ class GryfSmartOptionsFlow(config_entries.OptionsFlow):
     """Handle the options flow for the Gryf Smart Integration."""
 
     _edit_index: int
-    data: MappingProxyType[str, Any]
     _current_device: dict
+
+    data: dict[str, Any]
 
     def __init__(self) -> None:
         """Initialize OptionsFlow."""
@@ -256,7 +255,10 @@ class GryfSmartOptionsFlow(config_entries.OptionsFlow):
         self, user_input: dict[str, Any] | None = None
     ) -> config_entries.ConfigFlowResult:
         """Initialize the Gryf Smart options flow."""
-        self.data = self.config_entry.data
+        
+        self.data = dict(self.config_entry.data)
+        self.data.update(dict(self.config_entry.options or {}))
+
         _LOGGER.debug("%s", self.data)
         return await self.async_step_main_menu()
 
@@ -397,7 +399,13 @@ class GryfSmartOptionsFlow(config_entries.OptionsFlow):
         self, user_input: dict[str, Any] | None = None
     ) -> config_entries.ConfigFlowResult:
         """Finish config flow."""
-        return self.async_create_entry(data=self.data)
+
+        self.hass.config_entries.async_update_entry(
+            self.config_entry,
+            data=self.data,
+            title="",
+        )
+        return self.async_create_entry(title="", data={})
 
     async def async_step_communication(
         self, user_input: dict[str, Any] | None = None

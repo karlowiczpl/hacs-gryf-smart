@@ -51,7 +51,7 @@ async def async_setup(
     hass.data[DOMAIN][CONF_API] = api
 
     async def handle_reset(call: ServiceCall):
-        await api.reset(0)
+        await api.reset(0, True)
 
     async def handle_gryf_expert(call: ServiceCall):
         action = call.data["action"]
