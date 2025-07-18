@@ -10,7 +10,7 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import ConfigType , DiscoveryInfoType
 from homeassistant.helpers.restore_state import RestoreEntity
 
-from .const import CONF_API, CONF_DEVICE_CLASS , CONF_DEVICES, CONF_EXTRA , CONF_ID , CONF_NAME , DOMAIN, PLATFORM_SWITCH, SWITCH_DEVICE_CLASS
+from .const import CONF_API, CONF_DEVICE_CLASS , CONF_DEVICES, CONF_EXTRA , CONF_ID , CONF_NAME , DOMAIN, PLATFORM_SWITCH, SWITCH_DEVICE_CLASS, PLATFORM_SWITCH
 from .entity import GryfYamlEntity , GryfConfigFlowEntity
 
 async def async_setup_platform(
@@ -43,7 +43,7 @@ async def async_setup_entry(
 
     switches = []
     for conf in config_entry.data[CONF_DEVICES]:
-        if conf.get(CONF_TYPE) == Platform.SWITCH:
+        if conf.get(CONF_TYPE) == PLATFORM_SWITCH:
             device = GryfOutput(
                 conf.get(CONF_NAME),
                 conf.get(CONF_ID) // 10,

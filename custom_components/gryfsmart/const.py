@@ -54,10 +54,10 @@ CONFIG_FLOW_MENU_OPTIONS = {
 }
 
 DEVICE_TYPES = {
-    PLATFORM_COVER: "Shutter",
     PLATFORM_LIGHT: "Lights",
     PLATFORM_SWITCH: "Output",
     # Platform.SENSOR: "Input",
+    PLATFORM_COVER: "Shutter",
     PLATFORM_BINARY_SENSOR: "Binary input",
     PLATFORM_LOCK: "Lock",
     PLATFORM_CLIMATE: "Thermostat",
