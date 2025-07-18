@@ -90,7 +90,6 @@ async def async_setup_entry(
         api = GryfApi(entry.data[CONF_COMMUNICATION][CONF_PORT])
         await api.start_connection()
         api.start_update_interval(1)
-        await api.async_get_states(entry.data[CONF_COMMUNICATION][CONF_MODULE_COUNT])
     except ConnectionError:
         raise ConfigEntryNotReady("Unable to connect with device") from ConnectionError
 
@@ -155,6 +154,8 @@ async def async_setup_entry(
     hass.services.async_register(DOMAIN, "search_modules", handle_search_modules)
 
     await hass.config_entries.async_forward_entry_setups(entry, _PLATFORMS)
+
+    await api.async_get_states(entry.data[CONF_COMMUNICATION][CONF_MODULE_COUNT])
 
     return True
 
