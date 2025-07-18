@@ -90,6 +90,7 @@ async def async_setup_entry(
         api = GryfApi(entry.data[CONF_COMMUNICATION][CONF_PORT])
         await api.start_connection()
         api.start_update_interval(1)
+        await api.async_get_states(entry.data[CONF_COMMUNICATION][CONF_MODULE_COUNT])
     except ConnectionError:
         raise ConfigEntryNotReady("Unable to connect with device") from ConnectionError
 
