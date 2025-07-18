@@ -155,7 +155,8 @@ async def async_setup_entry(
 
     await hass.config_entries.async_forward_entry_setups(entry, _PLATFORMS)
 
-    await api.async_get_states(entry.data[CONF_COMMUNICATION][CONF_MODULE_COUNT])
+    # await api.async_get_states(entry.data[CONF_COMMUNICATION][CONF_MODULE_COUNT])
+    await api.async_get_states(10)
 
     return True
 
