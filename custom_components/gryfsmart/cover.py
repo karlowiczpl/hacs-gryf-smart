@@ -1,17 +1,19 @@
 """Handle the Gryf Smart Cover platform funtionality."""
 
+import asyncio
 from typing import Any
 
-from pygryfsmart.device import _GryfDevice, GryfCover
+from pygryfsmart.device import _GryfDevice, GryfCover, GryfOutput
 
 from homeassistant.components.cover import CoverEntity, CoverDeviceClass, CoverEntityFeature
+from homeassistant.components.button import ButtonEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_DEVICE, CONF_TYPE, Platform
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
 
-from .const import CONF_API, CONF_DEVICES, CONF_ID, CONF_EXTRA, CONF_NAME, DOMAIN, PLATFORM_COVER, CONF_TIME
+from .const import CONF_API, CONF_DEVICES, CONF_ID, CONF_EXTRA, CONF_NAME, DOMAIN, PLATFORM_COVER, CONF_TIME, PLATFORM_GATE
 from .entity import GryfConfigFlowEntity, GryfYamlEntity
 
 async def async_setup_platform(
@@ -53,8 +55,19 @@ async def async_setup_entry(
                 config_entry.runtime_data[CONF_API],
             )
             covers.append(GryfConfigFlowCover(device, config_entry))
+        if conf.get(CONF_TYPE) == PLATFORM_GATE:
+            pass
 
     async_add_entities(covers)
+
+    device = GryfOutput(
+        "test",
+        1,
+        1,
+        hass.data[DOMAIN][CONF_API]
+    )
+    async_add_entities([GryfNoFeedBackGateConfigFlow(device, config_entry)])
+
 
 class GryfCoverBase(CoverEntity):
     """Gryf Cover entity base."""
@@ -100,9 +113,33 @@ class GryfYamlCover(GryfYamlEntity, GryfCoverBase):
         super().__init__(device)
         device.subscribe(self.async_update)
 
-class GryfConfigFlowCover(GryfConfigFlowEntity, GryfCoverBase):
+class GryfNoFeedBackGateBase(ButtonEntity):
 
-    def __init__(self, device: GryfCover, config_entry: ConfigEntry):
+    _device: GryfOutput
+
+    async def async_press(self) -> None:
+        await self._device.turn_on()
+
+        await asyncio.sleep(1000)
+
+        await self._device.turn_off()
+
+    async def async_update(self, state):
+        if state:
+            self._attr_icon = "mdi:boom-gate-up"
+        else:
+            self._attr_icon = "mdi:boom-gate"
+
+        self.async_write_ha_state()
+
+class GryfNoFeedBackGateConfigFlow(GryfNoFeedBackGateBase):
+
+    def __init__(
+        self,
+        device: _GryfDevice,
+        config_entry: ConfigEntry,
+    ) -> None:
+
         self._config_entry = config_entry
         super().__init__(config_entry, device)
-        device.subscribe(self.async_update)
+        self._device.subscribe(self.async_update)

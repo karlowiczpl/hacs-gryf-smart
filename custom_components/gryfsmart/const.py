@@ -34,6 +34,7 @@ PLATFORM_SWITCH = "output"
 PLATFORM_CLIMATE = "climate"
 PLATFORM_LOCK = "lock"
 PLATFORM_COVER = "cover"
+PLATFORM_GATE = "gate"
 
 DEFAULT_PORT = "/dev/ttyUSB0"
 GRYF_IN_NAME = "Gryf IN"
@@ -64,6 +65,7 @@ DEVICE_TYPES = {
     PLATFORM_PWM: "PWM",
     PLATFORM_TEMPERATURE: "Termometr",
     PLATFORM_INPUT: "Input",
+    PLATFORM_GATE: "Gate",
 }
 
 CONF_LINE_SENSOR_ICONS = {
