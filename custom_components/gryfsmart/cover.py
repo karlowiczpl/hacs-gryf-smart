@@ -60,15 +60,6 @@ async def async_setup_entry(
 
     async_add_entities(covers)
 
-    device = GryfOutput(
-        "test",
-        1,
-        1,
-        hass.data[DOMAIN][CONF_API]
-    )
-    async_add_entities([GryfNoFeedBackGateConfigFlow(device, config_entry)])
-
-
 class GryfCoverBase(CoverEntity):
     """Gryf Cover entity base."""
 
@@ -112,34 +103,3 @@ class GryfYamlCover(GryfYamlEntity, GryfCoverBase):
 
         super().__init__(device)
         device.subscribe(self.async_update)
-
-class GryfNoFeedBackGateBase(ButtonEntity):
-
-    _device: GryfOutput
-
-    async def async_press(self) -> None:
-        await self._device.turn_on()
-
-        await asyncio.sleep(1000)
-
-        await self._device.turn_off()
-
-    async def async_update(self, state):
-        if state:
-            self._attr_icon = "mdi:boom-gate-up"
-        else:
-            self._attr_icon = "mdi:boom-gate"
-
-        self.async_write_ha_state()
-
-class GryfNoFeedBackGateConfigFlow(GryfNoFeedBackGateBase):
-
-    def __init__(
-        self,
-        device: _GryfDevice,
-        config_entry: ConfigEntry,
-    ) -> None:
-
-        self._config_entry = config_entry
-        super().__init__(config_entry, device)
-        self._device.subscribe(self.async_update)

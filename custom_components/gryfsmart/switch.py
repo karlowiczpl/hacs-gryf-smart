@@ -1,8 +1,9 @@
 """Handle the Gryf Smart Switch platform functionality."""
 
-from pygryfsmart.device import _GryfDevice , GryfOutput
+import asyncio
+from pygryfsmart.device import _GryfDevice, GryfInput , GryfOutput
 
-from homeassistant.components.switch import SwitchEntity , SwitchDeviceClass
+from homeassistant.components.switch import SwitchEntity , SwitchDeviceClass, SwitchEntityDescription
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import Platform , CONF_TYPE
 from homeassistant.core import HomeAssistant
@@ -10,7 +11,7 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import ConfigType , DiscoveryInfoType
 from homeassistant.helpers.restore_state import RestoreEntity
 
-from .const import CONF_API, CONF_DEVICE_CLASS , CONF_DEVICES, CONF_EXTRA , CONF_ID , CONF_NAME , DOMAIN, PLATFORM_SWITCH, SWITCH_DEVICE_CLASS, PLATFORM_SWITCH
+from .const import CONF_API, CONF_DEVICE_CLASS , CONF_DEVICES, CONF_EXTRA , CONF_ID , CONF_NAME , DOMAIN, PLATFORM_GATE, PLATFORM_SWITCH, SWITCH_DEVICE_CLASS, PLATFORM_SWITCH
 from .entity import GryfYamlEntity , GryfConfigFlowEntity
 
 async def async_setup_platform(
@@ -51,9 +52,95 @@ async def async_setup_entry(
                 config_entry.runtime_data[CONF_API],
             )
             switches.append(GryfConfigFlowSwitch(device , config_entry , conf.get(CONF_EXTRA , None)))
+        if conf.get(CONF_TYPE) == PLATFORM_GATE:
+            device = GryfOutput(
+                conf.get(CONF_NAME),
+                conf.get(CONF_ID) // 10,
+                conf.get(CONF_ID) % 10,
+                config_entry.runtime_data[CONF_API],
+            )
+            switches.append(GryfGateConfigFlow(device, config_entry, conf.get(CONF_EXTRA)))
 
     async_add_entities(switches)
     
+class GryfGateBase(SwitchEntity):
+    
+    _attr_is_on = False
+    _attr_icon = "mdi:boom-gate"
+
+    _device: GryfOutput
+    _input_device: GryfInput
+    _input_negation = 0
+    _output_state = 0
+
+    async def async_update_output(self, is_on):
+        self._output_state = is_on
+        self._attr_is_on = is_on
+
+        self.async_write_ha_state()
+
+    async def async_update_input(self, is_on):
+        if is_on:
+            self._attr_icon = "mdi:boom-gate-up"
+        else:
+            self._attr_icon = "mdi:boom-gate"
+
+        self.async_write_ha_state()
+
+    async def async_turn_on(self, **kwargs):
+
+        await self._device.turn_on()
+
+        await asyncio.sleep(1)
+
+        await self._device.turn_off()
+
+    async def async_toggle(self, **kwargs) -> None:
+
+        await self._device.turn_on()
+
+        await asyncio.sleep(1)
+
+        await self._device.turn_off()
+
+    async def async_turn_off(self, **kwargs) -> None:
+        pass
+
+    def extra_parm(self, extra: str, api):
+
+        filtred_extra = ""
+        if extra:
+            for char in extra:
+                if char == 'n' or char == "N":
+                    self._input_negation = 1
+                else:
+                    filtred_extra += char
+            
+            if filtred_extra.strip().isdigit:
+                id = int(filtred_extra)
+                if id > 11:
+                    self._input_device = GryfInput(
+                        "input",
+                        id // 10,
+                        id % 10,
+                        api
+                    )
+
+                self._input_device.subscribe(self.async_update_input)
+
+class GryfGateConfigFlow(GryfConfigFlowEntity, GryfGateBase):
+    
+    def __init__(
+        self,
+        device: _GryfDevice,
+        config_entry: ConfigEntry,
+        extra_parm: str,
+    ) -> None:
+
+        super().__init__(config_entry, device)
+        self._device.subscribe(self.async_update_output)
+        self.extra_parm(extra_parm, config_entry.runtime_data[CONF_API])
+
 class GryfSwitchBase(SwitchEntity, RestoreEntity):
     """Gryf Switch entity base."""
 
@@ -121,7 +208,7 @@ class GryfYamlSwitch(GryfYamlEntity , GryfSwitchBase):
         device_class: str,
     ) -> None:
         """Init the Gryf Switch."""
-        
+
         super().__init__(device)
         self._device.subscribe(self.async_update)
 
