@@ -5,12 +5,6 @@ import voluptuous as vol
 from homeassistant.helpers import config_validation as cv
 
 from .const import (
-    CONF_ID,
-    CONF_MODULE_COUNT,
-    CONF_NAME,
-    CONF_PORT,
-    CONF_DEVICE_CLASS,
-    CONF_TIME,
     DOMAIN,
     PLATFORM_BINARY_SENSOR,
     PLATFORM_CLIMATE,
@@ -19,8 +13,16 @@ from .const import (
     PLATFORM_LIGHT,
     PLATFORM_PWM,
     PLATFORM_SWITCH,
+    PLATFORM_GATE,
     CONF_TEMP,
     CONF_OUT,
+    CONF_INPUTS,
+    CONF_ID,
+    CONF_MODULE_COUNT,
+    CONF_NAME,
+    CONF_PORT,
+    CONF_DEVICE_CLASS,
+    CONF_TIME,
 )
 
 STANDARD_SCHEMA = vol.Schema(
@@ -43,12 +45,18 @@ CLIMATE_SCHEMA = vol.Schema(
         vol.Required(CONF_TEMP): cv.positive_int,
     }
 )
-
 COVER_SCHEMA = vol.Schema(
     {
         vol.Required(CONF_NAME): cv.string,
         vol.Required(CONF_ID): cv.positive_int,
         vol.Required(CONF_TIME): cv.positive_int,
+    }
+)
+GATE_SCHEMA = vol.Schema(
+    {
+        vol.Required(CONF_NAME): cv.string,
+        vol.Required(CONF_ID): cv.positive_int,
+        vol.Optional(CONF_INPUTS): cv.positive_int,
     }
 )
 
@@ -65,6 +73,7 @@ CONFIG_SCHEMA = vol.Schema(
                 vol.Optional(PLATFORM_SWITCH): vol.All(cv.ensure_list , [DEVICE_CLASS_SCHEMA]),
                 vol.Optional(PLATFORM_CLIMATE): vol.All(cv.ensure_list , [CLIMATE_SCHEMA]),
                 vol.Optional(PLATFORM_COVER): vol.All(cv.ensure_list , [COVER_SCHEMA]),
+                vol.Optional(PLATFORM_GATE): vol.All(cv.ensure_list , [GATE_SCHEMA]),
             }
         )
     },

@@ -1,6 +1,7 @@
 """Handle the Gryf Smart Switch platform functionality."""
 
 import asyncio
+from pygryfsmart import GryfApi
 from pygryfsmart.device import _GryfDevice, GryfInput , GryfOutput
 
 from homeassistant.components.switch import SwitchEntity , SwitchDeviceClass, SwitchEntityDescription
@@ -11,7 +12,7 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import ConfigType , DiscoveryInfoType
 from homeassistant.helpers.restore_state import RestoreEntity
 
-from .const import CONF_API, CONF_DEVICE_CLASS , CONF_DEVICES, CONF_EXTRA , CONF_ID , CONF_NAME , DOMAIN, PLATFORM_GATE, PLATFORM_SWITCH, SWITCH_DEVICE_CLASS, PLATFORM_SWITCH
+from .const import CONF_API, CONF_DEVICE_CLASS , CONF_DEVICES, CONF_EXTRA , CONF_ID, CONF_INPUTS , CONF_NAME , DOMAIN, PLATFORM_GATE, PLATFORM_SWITCH, SWITCH_DEVICE_CLASS, PLATFORM_SWITCH
 from .entity import GryfYamlEntity , GryfConfigFlowEntity
 
 async def async_setup_platform(
@@ -32,6 +33,15 @@ async def async_setup_platform(
             hass.data[DOMAIN][CONF_API],
         )
         switches.append(GryfYamlSwitch(device , conf.get(CONF_DEVICE_CLASS)))
+
+    for conf in hass.data[DOMAIN].get(PLATFORM_GATE, []):
+        device = GryfOutput(
+            conf.get(CONF_NAME),
+            conf.get(CONF_ID) // 10,
+            conf.get(CONF_ID) % 10,
+            hass.data[DOMAIN][CONF_API],
+        )
+        switches.append(GryfGateYaml(device, conf.get(CONF_INPUTS), hass.data[DOMAIN][CONF_API]))
 
     async_add_entities(switches)
 
@@ -140,6 +150,19 @@ class GryfGateConfigFlow(GryfConfigFlowEntity, GryfGateBase):
         super().__init__(config_entry, device)
         self._device.subscribe(self.async_update_output)
         self.extra_parm(extra_parm, config_entry.runtime_data[CONF_API])
+
+class GryfGateYaml(GryfYamlEntity, GryfGateBase):
+
+    def __init__(
+        self,
+        device: _GryfDevice,
+        extra_parm: str,
+        api: GryfApi,
+    ) -> None:
+
+        super().__init__(device)
+        self._device.subscribe(self.async_update_output)
+        self.extra_parm(extra_parm, api)
 
 class GryfSwitchBase(SwitchEntity, RestoreEntity):
     """Gryf Switch entity base."""
