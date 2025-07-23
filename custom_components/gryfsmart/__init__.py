@@ -86,15 +86,20 @@ async def async_setup_entry(
 ) -> bool:
     """Config flow for Gryf Smart Integration."""
 
-    try:
-        api = GryfApi(entry.data[CONF_COMMUNICATION][CONF_PORT])
-        await api.start_connection()
+    if hass.data[DOMAIN][CONF_API] and hass.data[DOMAIN][CONF_API]._writer.port == entry.data[CONF_COMMUNICATION][CONF_PORT]:
+        api = hass.data[DOMAIN][CONF_API]
+        entry.runtime_data[CONF_API] = api
 
-        api.set_module_count(entry.data[CONF_COMMUNICATION][CONF_MODULE_COUNT])
-        api.start_update_interval(api._module_count)
+    else:
+        try:
+            api = GryfApi(entry.data[CONF_COMMUNICATION][CONF_PORT])
+            await api.start_connection()
 
-    except ConnectionError:
-        raise ConfigEntryNotReady("Unable to connect with device") from ConnectionError
+            api.set_module_count(entry.data[CONF_COMMUNICATION][CONF_MODULE_COUNT])
+            api.start_update_interval(api._module_count)
+
+        except ConnectionError:
+            raise ConfigEntryNotReady("Unable to connect with device") from ConnectionError
 
     entry.runtime_data = {}
     entry.runtime_data[CONF_API] = api
