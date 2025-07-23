@@ -402,8 +402,7 @@ class GryfSmartOptionsFlow(config_entries.OptionsFlow):
 
         self.hass.config_entries.async_update_entry(
             self.config_entry,
-            data=self.data,
-            title="",
+            options=self.data,
         )
         return self.async_create_entry(title="", data={})
 
