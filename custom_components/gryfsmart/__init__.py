@@ -86,7 +86,7 @@ async def async_setup_entry(
 ) -> bool:
     """Config flow for Gryf Smart Integration."""
 
-    if hass.data[DOMAIN][CONF_API] and hass.data[DOMAIN][CONF_API]._writer.port == entry.data[CONF_COMMUNICATION][CONF_PORT]:
+    if DOMAIN in hass.data and hass.data[DOMAIN][CONF_API] and hass.data[DOMAIN][CONF_API]._writer.port == entry.data[CONF_COMMUNICATION][CONF_PORT]:
         api = hass.data[DOMAIN][CONF_API]
         entry.runtime_data[CONF_API] = api
 
