@@ -83,6 +83,10 @@ CONFIG_FLOW_DEVICE_TYPES = {
     PLATFORM_COVER: "Cover",
     PLATFORM_PWM: "Pwm",
     PLATFORM_TEMPERATURE: "Temperature",
+    PLATFORM_CLIMATE: "Thermostat",
+    PLATFORM_LOCK: "Lock",
+    PLATFORM_INPUT: "input",
+    PLATFORM_GATE: "gate",
 
     "device_menu": "Exit",
 }
