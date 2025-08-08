@@ -299,7 +299,7 @@ class GryfSmartConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     CONF_NAME: user_input[CONF_NAME],
                 }
                 self._config_data[CONF_DEVICES].append(entity_data)
-                self._last_id = user_input[CONF_ID]
+                self._last_id = user_input[CONF_OUT_ID]
             else:
                 return await self.async_step_add_device(None)
 
