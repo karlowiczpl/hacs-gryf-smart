@@ -290,7 +290,7 @@ class GryfSmartConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     ) -> config_entries.ConfigFlowResult:
         if user_input:
 
-            if user_input[CONF_ID] and user_input[CONF_NAME]:
+            if user_input[CONF_OUT_ID] and user_input[CONF_NAME]:
                 entity_data = {
                     CONF_TYPE: PLATFORM_CLIMATE,
                     CONF_ID: user_input[CONF_OUT_ID],
