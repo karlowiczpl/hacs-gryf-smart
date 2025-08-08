@@ -20,7 +20,9 @@ from .const import (
     CONF_ID,
     CONF_NAME,
     CONF_TYPE,
+    CONF_NEGATION,
     CONF_DEVICE_CLASS,
+
     DOMAIN,
     PLATFORM_BINARY_SENSOR,
 )
@@ -70,6 +72,7 @@ async def async_setup_entry(
                     device,
                     config_entry,
                     conf.get(CONF_EXTRA),
+                    conf.get(CONF_NEGATION)
                 )
             )
 
@@ -81,6 +84,7 @@ class _GryfBinarySensorBase(BinarySensorEntity, RestoreEntity):
 
     _is_on = False
     _attr_device_class = BinarySensorDeviceClass.OPENING
+    _negation = 0
 
     @property
     def is_on(self) -> bool:
@@ -94,7 +98,12 @@ class _GryfBinarySensorBase(BinarySensorEntity, RestoreEntity):
 
     async def async_update(self, state):
         if state in [0, 1]:
-            self._is_on = state
+
+            if self._negation:
+                self._is_on = not state
+            else:
+                self._is_on = state
+
             self.async_write_ha_state()
 
 
@@ -106,6 +115,7 @@ class GryfConfigFlowBinarySensor(GryfConfigFlowEntity, _GryfBinarySensorBase):
         device: _GryfDevice,
         config_entry: ConfigEntry,
         device_class: BinarySensorDeviceClass | None,
+        negation: bool,
     ) -> None:
         """Init the gryf binary sensor."""
 

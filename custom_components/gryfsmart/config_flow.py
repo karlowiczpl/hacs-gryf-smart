@@ -3,19 +3,17 @@
 import logging
 from types import MappingProxyType
 from typing import Any
-import uuid
 
-from pygryfsmart import GryfApi
-
-from serial import SerialException
 import voluptuous as vol
 
 from homeassistant import config_entries
 from homeassistant.core import callback
 from homeassistant.helpers import selector
+from homeassistant.config_entries import OptionsFlow
 
 from .const import (
     BINARY_SENSOR_DEVICE_CLASS,
+
     CONF_COMMUNICATION,
     CONF_DEVICES,
     CONF_EXTRA,
@@ -24,31 +22,33 @@ from .const import (
     CONF_NAME,
     CONF_PORT,
     CONF_TYPE,
-    CONFIG_FLOW_MENU_OPTIONS,
+    CONF_DEVICE_CLASS,
+    CONF_TIME,
+    CONF_NEGATION,
+    CONF_TEMP_ID,
+    CONF_OUT_ID,
+    CONF_HYSTERESIS_LOOP,
+
     DEFAULT_PORT,
-    DEVICE_TYPES,
     DOMAIN,
+    SWITCH_DEVICE_CLASS,
+
     PLATFORM_BINARY_SENSOR,
     PLATFORM_SWITCH,
-    SWITCH_DEVICE_CLASS,
+    PLATFORM_LIGHT,
+    PLATFORM_COVER,
+    PLATFORM_LOCK,
+    PLATFORM_CLIMATE,
+    PLATFORM_PWM,
+    PLATFORM_TEMPERATURE,
+    PLATFORM_INPUT,
+    PLATFORM_GATE,
+
+    CONFIG_FLOW_MENU_OPTIONS,
+    CONFIG_FLOW_DEVICE_TYPES,
 )
 
 _LOGGER = logging.getLogger(__name__)
-
-
-async def ping_connection(port) -> bool:
-    """Test connection."""
-    writer = GryfApi(port, 115200)
-    try:
-        await writer.start_connection()
-        await writer.stop_connection()
-        return True
-    except SerialException as e:
-        _LOGGER.error("%s", e)
-        return False
-    else:
-        return True
-
 
 class GryfSmartConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     """Gryf Smart ConfigFlow."""
@@ -56,39 +56,51 @@ class GryfSmartConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     VERSION = 1
     CONNECTION_CLASS = config_entries.CONN_CLASS_LOCAL_PUSH
 
+
     def __init__(self) -> None:
         """Initialize Gryf Smart ConfigFlow."""
         super().__init__()
-        self._config_data: dict[str, Any] = {}
-        self._config_data[CONF_DEVICES] = []
-        self._current_device: dict[str, Any]
-        self._edit_index: int | None = None
+
+        self._config_data: dict[str, Any] = {
+            CONF_DEVICES: [],
+            CONF_COMMUNICATION: {}
+        }
+
+        self._unique_id: str
+        self._last_id = 11
+        self._last_name = ""
+
+        self._editing_platform_function = {
+            PLATFORM_PWM: self.async_step_pwm,
+            PLATFORM_TEMPERATURE: self.async_step_temperature,
+            PLATFORM_INPUT: self.async_step_input,
+            PLATFORM_LIGHT: self.async_step_light,
+            PLATFORM_BINARY_SENSOR: self.async_step_binary_sensor,
+            PLATFORM_SWITCH: self.async_step_output,
+            PLATFORM_CLIMATE: self.async_step_climate,
+            PLATFORM_LOCK: self.async_step_lock,
+            PLATFORM_COVER: self.async_step_cover,
+            PLATFORM_GATE: self.async_step_gate,
+        }       
 
     async def async_step_user(
-        self, user_input: dict[str, Any] | None = None
+        self,
+        user_input: dict[str, Any] | None = None
     ) -> config_entries.ConfigFlowResult:
         """First config flow step, selecting communication parameters."""
 
         errors = {}
 
         if user_input:
-            if not await ping_connection(user_input.get(CONF_PORT)):
-                errors[CONF_PORT] = "Unable to connect"
-            else:
-                self._config_data = {
-                    CONF_COMMUNICATION: {},
-                    CONF_DEVICES: [],
-                }
+            self._config_data[CONF_COMMUNICATION][CONF_PORT] = user_input[CONF_PORT]
+            self._config_data[CONF_COMMUNICATION][CONF_MODULE_COUNT] = user_input[CONF_MODULE_COUNT]
 
-                self._config_data[CONF_COMMUNICATION][CONF_PORT] = user_input[CONF_PORT]
-                self._config_data[CONF_COMMUNICATION][CONF_MODULE_COUNT] = user_input[
-                    CONF_MODULE_COUNT
-                ]
+            self._unique_id = user_input[CONF_PORT]
 
-                return await self.async_step_device_menu()
+            await self.async_set_unique_id(self._unique_id)
+            self._abort_if_unique_id_configured()
 
-        await self.async_set_unique_id(str(uuid.uuid4())[:8])
-        self._abort_if_unique_id_configured()
+            return await self.async_step_device_menu()
 
         return self.async_show_form(
             step_id="user",
@@ -102,7 +114,8 @@ class GryfSmartConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         )
 
     async def async_step_device_menu(
-        self, user_input: dict[str, Any] | None = None
+        self,
+        user_input: dict[str, Any] | None = None
     ) -> config_entries.ConfigFlowResult:
         """Show menu step."""
 
@@ -112,53 +125,325 @@ class GryfSmartConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         )
 
     async def async_step_add_device(
-        self, user_input: dict[str, Any] | None = None
+        self,
+        user_input: dict[str, Any] | None = None
     ) -> config_entries.ConfigFlowResult:
         """Add new device."""
 
-        errors = {}
-        if user_input:
-            new_device = {
-                CONF_TYPE: user_input[CONF_TYPE],
-                CONF_NAME: user_input[CONF_NAME],
-                CONF_ID: user_input[CONF_ID],
-                CONF_EXTRA: user_input.get(CONF_EXTRA),
-            }
-            self._config_data[CONF_DEVICES].append(new_device)
+        return self.async_show_menu(
+            step_id="add_device",
+            menu_options=CONFIG_FLOW_DEVICE_TYPES,
+        )
 
-            if (
-                check_extra_parameter(
-                    user_input.get(CONF_EXTRA), user_input.get(CONF_TYPE)
-                )
-                is None): return await self.async_step_device_menu()
-            errors[CONF_TYPE] = "Bad binary sensor extra parameter!"
+    async def async_step_light(
+        self,
+        user_input: dict[str, Any] | None=None,
+        edited: dict[str, Any] | None=None,
+    ) -> config_entries.ConfigFlowResult:
+        if user_input:
+
+            if user_input[CONF_ID] and user_input[CONF_NAME]:
+                entity_data = {
+                    CONF_TYPE: PLATFORM_LIGHT,
+                    CONF_ID: user_input[CONF_ID],
+                    CONF_NAME: user_input[CONF_NAME],
+                }
+                self._config_data[CONF_DEVICES].append(entity_data)
+                self._last_id = user_input[CONF_ID]
+            else:
+                return await self.async_step_add_device(None)
 
         return self.async_show_form(
-            step_id="add_device",
+            step_id=PLATFORM_LIGHT,
             data_schema=vol.Schema(
                 {
-                    vol.Required(CONF_TYPE): vol.In(DEVICE_TYPES),
-                    vol.Required(CONF_NAME): str,
-                    vol.Required(CONF_ID): int,
-                    vol.Optional(CONF_EXTRA): str,
+                    vol.Optional(CONF_NAME, default=edited[CONF_NAME] if edited else ""): str, 
+                    vol.Optional(CONF_ID, default=edited[CONF_ID] if edited else self._last_id): int,
                 }
-            ),
-            errors=errors,
+            )
+        )
+
+    async def async_step_output(
+        self,
+        user_input: dict[str, Any] | None=None,
+        edited: dict[str, Any] | None=None,
+    ) -> config_entries.ConfigFlowResult:
+        if user_input:
+
+            if user_input[CONF_NAME] and user_input[CONF_ID]:
+                entity_data = {
+                    CONF_TYPE: PLATFORM_SWITCH,
+                    CONF_ID: user_input[CONF_ID],
+                    CONF_NAME: user_input[CONF_NAME],
+                    CONF_EXTRA: user_input[CONF_DEVICE_CLASS],
+                }
+                self._config_data[CONF_DEVICES].append(entity_data)
+                self._last_id = user_input[CONF_ID]
+            else:
+                return await self.async_step_add_device(None)
+
+        return self.async_show_form(
+            step_id=PLATFORM_SWITCH,
+            data_schema=vol.Schema(
+                {
+                    vol.Optional(CONF_NAME, default=edited[CONF_NAME] if edited else self._last_name): str, 
+                    vol.Optional(CONF_ID, default=edited[CONF_ID] if edited else self._last_id): int,
+                    vol.Required(CONF_DEVICE_CLASS, default=edited[CONF_EXTRA] if edited and edited[CONF_EXTRA] else "switch"): vol.In(SWITCH_DEVICE_CLASS),
+                }
+            )
+        )
+
+    async def async_step_binary_sensor(
+        self,
+        user_input: dict[str, Any] | None=None,
+        edited: dict[str, Any] | None=None,
+    ) -> config_entries.ConfigFlowResult:
+        if user_input:
+
+            if user_input[CONF_ID] and user_input[CONF_NAME]:
+                entity_data = {
+                    CONF_TYPE: PLATFORM_BINARY_SENSOR,
+                    CONF_ID: user_input[CONF_ID],
+                    CONF_NAME: user_input[CONF_NAME],
+                    CONF_EXTRA: user_input[CONF_DEVICE_CLASS],
+                    CONF_NEGATION: user_input[CONF_NEGATION],
+                }
+                self._config_data[CONF_DEVICES].append(entity_data)
+                self._last_id = user_input[CONF_ID]
+            else:
+                return await self.async_step_add_device(None)
+
+        return self.async_show_form(
+            step_id=PLATFORM_BINARY_SENSOR,
+            data_schema=vol.Schema(
+                {
+                    vol.Optional(CONF_NAME, default=edited[CONF_NAME] if edited else self._last_name): str, 
+                    vol.Optional(CONF_ID, default=edited[CONF_ID] if edited else self._last_id): int,
+                    vol.Required(CONF_NEGATION, default=edited[CONF_NEGATION] if edited and edited[CONF_NEGATION] else 0): bool,
+                    vol.Required(CONF_DEVICE_CLASS, default=edited[CONF_EXTRA] if edited and edited[CONF_EXTRA] else "door"): vol.In(BINARY_SENSOR_DEVICE_CLASS),
+                }
+            )
+        )
+
+    async def async_step_cover(
+        self,
+        user_input: dict[str, Any] | None=None,
+        edited: dict[str, Any] | None=None,
+    ) -> config_entries.ConfigFlowResult:
+        if user_input:
+
+            if user_input[CONF_ID] and user_input[CONF_NAME]:
+                entity_data = {
+                    CONF_TYPE: PLATFORM_COVER,
+                    CONF_ID: user_input[CONF_ID],
+                    CONF_NAME: user_input[CONF_NAME],
+                    CONF_EXTRA: user_input[CONF_TIME],
+                }
+                self._config_data[CONF_DEVICES].append(entity_data)
+                self._last_id = user_input[CONF_ID]
+            else:
+                return await self.async_step_add_device(None)
+
+        return self.async_show_form(
+            step_id=PLATFORM_COVER,
+            data_schema=vol.Schema(
+                {
+                    vol.Optional(CONF_NAME, default=edited[CONF_NAME] if edited else self._last_name): str, 
+                    vol.Optional(CONF_ID, default=edited[CONF_ID] if edited else self._last_id): int,
+                    vol.Required(CONF_TIME, default=edited[CONF_EXTRA] if edited else 100): int,
+                }
+            )
+        )
+
+    async def async_step_lock(
+        self,
+        user_input: dict[str, Any] | None=None,
+        edited: dict[str, Any] | None=None,
+    ) -> config_entries.ConfigFlowResult:
+        if user_input:
+
+            if user_input[CONF_ID] and user_input[CONF_NAME]:
+                entity_data = {
+                    CONF_TYPE: PLATFORM_LOCK,
+                    CONF_ID: user_input[CONF_ID],
+                    CONF_NAME: user_input[CONF_NAME],
+                }
+                self._config_data[CONF_DEVICES].append(entity_data)
+                self._last_id = user_input[CONF_ID]
+            else:
+                return await self.async_step_add_device(None)
+
+        return self.async_show_form(
+            step_id=PLATFORM_LOCK,
+            data_schema=vol.Schema(
+                {
+                    vol.Optional(CONF_NAME, default=edited[CONF_NAME] if edited else self._last_name): str, 
+                    vol.Optional(CONF_ID, default=edited[CONF_ID] if edited else self._last_id): int,
+                }
+            )
+        )
+
+    async def async_step_climate(
+        self,
+        user_input: dict[str, Any] | None=None,
+        edited: dict[str, Any] | None=None,
+    ) -> config_entries.ConfigFlowResult:
+        if user_input:
+
+            if user_input[CONF_ID] and user_input[CONF_NAME]:
+                entity_data = {
+                    CONF_TYPE: PLATFORM_CLIMATE,
+                    CONF_ID: user_input[CONF_OUT_ID],
+                    CONF_EXTRA: user_input[CONF_TEMP_ID],
+                    CONF_HYSTERESIS_LOOP: user_input[CONF_HYSTERESIS_LOOP],
+                    CONF_NAME: user_input[CONF_NAME],
+                }
+                self._config_data[CONF_DEVICES].append(entity_data)
+                self._last_id = user_input[CONF_ID]
+            else:
+                return await self.async_step_add_device(None)
+
+        return self.async_show_form(
+            step_id=PLATFORM_CLIMATE,
+            data_schema=vol.Schema(
+                {
+                    vol.Optional(CONF_NAME, default=edited[CONF_NAME] if edited else self._last_name): str, 
+                    vol.Optional(CONF_OUT_ID, default=edited[CONF_ID] if edited else self._last_id): int,
+                    vol.Optional(CONF_TEMP_ID, default=edited[CONF_EXTRA] if edited and edited[CONF_EXTRA] else 0): int,
+                    vol.Optional(CONF_HYSTERESIS_LOOP, default=edited[CONF_HYSTERESIS_LOOP] if edited and edited[CONF_HYSTERESIS_LOOP] else 0): int,
+                }
+            )
+        )
+
+    async def async_step_pwm(
+        self,
+        user_input: dict[str, Any] | None=None,
+        edited: dict[str, Any] | None=None,
+    ) -> config_entries.ConfigFlowResult:
+        if user_input:
+
+            if user_input[CONF_ID] and user_input[CONF_NAME]:
+                entity_data = {
+                    CONF_TYPE: PLATFORM_PWM,
+                    CONF_ID: user_input[CONF_ID],
+                    CONF_NAME: user_input[CONF_NAME],
+                }
+                self._config_data[CONF_DEVICES].append(entity_data)
+                self._last_id = user_input[CONF_ID]
+            else:
+                return await self.async_step_add_device(None)
+
+        return self.async_show_form(
+            step_id=PLATFORM_PWM,
+            data_schema=vol.Schema(
+                {
+                    vol.Optional(CONF_NAME, default=edited[CONF_NAME] if edited else self._last_name): str, 
+                    vol.Optional(CONF_ID, default=edited[CONF_ID] if edited else self._last_id): int,
+                }
+            )
+        )
+
+    async def async_step_temperature(
+        self,
+        user_input: dict[str, Any] | None=None,
+        edited: dict[str, Any] | None=None,
+    ) -> config_entries.ConfigFlowResult:
+        if user_input:
+
+            if user_input[CONF_ID] and user_input[CONF_NAME]:
+                entity_data = {
+                    CONF_TYPE: PLATFORM_TEMPERATURE,
+                    CONF_ID: user_input[CONF_ID],
+                    CONF_NAME: user_input[CONF_NAME],
+                }
+                self._config_data[CONF_DEVICES].append(entity_data)
+                self._last_id = user_input[CONF_ID]
+            else:
+                return await self.async_step_add_device(None)
+
+        return self.async_show_form(
+            step_id=PLATFORM_TEMPERATURE,
+            data_schema=vol.Schema(
+                {
+                    vol.Optional(CONF_NAME, default=edited[CONF_NAME] if edited else self._last_name): str, 
+                    vol.Optional(CONF_ID, default=edited[CONF_ID] if edited else self._last_id): int,
+                }
+            )
+        )
+
+    async def async_step_input(
+        self,
+        user_input: dict[str, Any] | None=None,
+        edited: dict[str, Any] | None=None,
+    ) -> config_entries.ConfigFlowResult:
+        if user_input:
+
+            if user_input[CONF_ID] and user_input[CONF_NAME]:
+                entity_data = {
+                    CONF_TYPE: PLATFORM_INPUT,
+                    CONF_ID: user_input[CONF_ID],
+                    CONF_NAME: user_input[CONF_NAME],
+                }
+                self._config_data[CONF_DEVICES].append(entity_data)
+                self._last_id = user_input[CONF_ID]
+            else:
+                return await self.async_step_add_device(None)
+
+        return self.async_show_form(
+            step_id=PLATFORM_INPUT,
+            data_schema=vol.Schema(
+                {
+                    vol.Optional(CONF_NAME, default=edited[CONF_NAME] if edited else self._last_name): str, 
+                    vol.Optional(CONF_ID, default=edited[CONF_ID] if edited else self._last_id): int,
+                }
+            )
+        )
+
+    async def async_step_gate(
+        self,
+        user_input: dict[str, Any] | None=None,
+        edited: dict[str, Any] | None=None,
+    ) -> config_entries.ConfigFlowResult:
+        if user_input:
+
+            if user_input[CONF_ID] and user_input[CONF_NAME]:
+                entity_data = {
+                    CONF_TYPE: PLATFORM_GATE,
+                    CONF_ID: user_input[CONF_ID],
+                    CONF_NAME: user_input[CONF_NAME],
+                }
+                self._config_data[CONF_DEVICES].append(entity_data)
+                self._last_id = user_input[CONF_ID]
+            else:
+                return await self.async_step_add_device(None)
+
+        return self.async_show_form(
+            step_id=PLATFORM_GATE,
+            data_schema=vol.Schema(
+                {
+                    vol.Optional(CONF_NAME, default=edited[CONF_NAME] if edited else self._last_name): str, 
+                    vol.Optional(CONF_ID, default=edited[CONF_NAME] if edited else self._last_id): int,
+                }
+            )
         )
 
     async def async_step_edit_device(
-        self, user_input: dict[str, Any] | None = None
+        self,
+        user_input: dict[str, Any] | None = None
     ) -> config_entries.ConfigFlowResult:
         """Select device to edit."""
+
         if not self._config_data[CONF_DEVICES]:
             return await self.async_step_device_menu()
 
         if user_input:
-            self._edit_index = int(user_input["device_index"])
-            self._current_device = self._config_data[CONF_DEVICES][
-                self._edit_index
-            ].copy()
-            return await self.async_step_edit_device_details()
+            edit_index = int(user_input["device_index"])
+            current_device = self._config_data[CONF_DEVICES][edit_index].copy()
+            device_type = self._config_data[CONF_DEVICES][edit_index][CONF_TYPE]
+
+            del self._config_data[CONF_DEVICES][edit_index]
+
+            return await self._editing_platform_function[device_type](None, edited=current_device)
 
         devices = [
             selector.SelectOptionDict(
@@ -178,51 +463,12 @@ class GryfSmartConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             ),
         )
 
-    async def async_step_edit_device_details(
-        self, user_input: dict[str, Any] | None = None
-    ) -> config_entries.ConfigFlowResult:
-        """Edit device parameters."""
-
-        errors = {}
-
-        if user_input:
-            if (
-                check_extra_parameter(
-                    user_input.get(CONF_EXTRA), user_input.get(CONF_TYPE)
-                )
-                is None
-            ):
-                self._config_data[CONF_DEVICES][self._edit_index] = user_input
-                self._config_data[CONF_DEVICES][self._edit_index][CONF_EXTRA] = (
-                    user_input.get(CONF_EXTRA)
-                )
-                self._edit_index = None
-                return await self.async_step_device_menu()
-            errors[CONF_TYPE] = "Bad binary sensor extra parameter!"
-
-        return self.async_show_form(
-            step_id="edit_device_details",
-            data_schema=vol.Schema(
-                {
-                    vol.Required(
-                        CONF_TYPE, default=self._current_device[CONF_TYPE]
-                    ): vol.In(DEVICE_TYPES),
-                    vol.Required(
-                        CONF_NAME, default=self._current_device[CONF_NAME]
-                    ): str,
-                    vol.Required(CONF_ID, default=self._current_device[CONF_ID]): int,
-                    vol.Optional(
-                        CONF_EXTRA, default=self._current_device.get(CONF_EXTRA)
-                    ): str,
-                }
-            ),
-            errors=errors,
-        )
-
     async def async_step_finish(
-        self, user_input: dict[str, Any] | None = None
+        self, 
+        user_input: dict[str, Any] | None=None,
     ) -> config_entries.ConfigFlowResult:
         """Finish the config flow."""
+
         return self.async_create_entry(
             title=f"GryfSmart: {self._config_data[CONF_COMMUNICATION][CONF_PORT]}",
             data=self._config_data,
@@ -237,219 +483,49 @@ class GryfSmartConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         return GryfSmartOptionsFlow()
 
-
-class GryfSmartOptionsFlow(config_entries.OptionsFlow):
-    """Handle the options flow for the Gryf Smart Integration."""
-
-    _edit_index: int
-    _current_device: dict
-
-    data: dict[str, Any]
-
-    def __init__(self) -> None:
-        """Initialize OptionsFlow."""
-        self._edit_index = 0
-        self._current_device = {}
+class GryfSmartOptionsFlow(OptionsFlow, GryfSmartConfigFlow):
 
     async def async_step_init(
-        self, user_input: dict[str, Any] | None = None
+        self,
+        user_input: dict[str, Any] | None=None,
     ) -> config_entries.ConfigFlowResult:
-        """Initialize the Gryf Smart options flow."""
+
+        self._config_data = dict(self.config_entry.data)
+        self._config_data.update(dict(self.config_entry.options or {}))
+
+        return await self.async_step_device_menu(None)
         
-        self.data = dict(self.config_entry.data)
-        self.data.update(dict(self.config_entry.options or {}))
-
-        _LOGGER.debug("%s", self.data)
-        return await self.async_step_main_menu()
-
-    async def async_step_main_menu(
-        self, user_input: dict[str, Any] | None = None
+    async def async_step_communication(
+        self,
+        user_input: dict[str, Any] | None = None
     ) -> config_entries.ConfigFlowResult:
-        """Show main options menu."""
-        return self.async_show_menu(
-            step_id="main_menu", menu_options=CONFIG_FLOW_MENU_OPTIONS
-        )
-
-    async def async_step_add_device(
-        self, user_input: dict[str, Any] | None = None
-    ) -> config_entries.ConfigFlowResult:
-        """Add new device."""
+        """First config flow step, selecting communication parameters."""
 
         errors = {}
 
         if user_input:
-            new_device = {
-                CONF_TYPE: user_input[CONF_TYPE],
-                CONF_NAME: user_input[CONF_NAME],
-                CONF_ID: user_input[CONF_ID],
-                CONF_EXTRA: user_input.get(CONF_EXTRA),
-            }
-            if (
-                check_extra_parameter(
-                    user_input.get(CONF_EXTRA), user_input.get(CONF_TYPE)
-                )
-                is None
-            ):
-                self.data["devices"].append(new_device)
-                return await self.async_step_main_menu()
-            errors[CONF_TYPE] = "Bad binary sensor extra parameter!"
+            self._config_data[CONF_COMMUNICATION][CONF_PORT] = user_input[CONF_PORT]
+            self._config_data[CONF_COMMUNICATION][CONF_MODULE_COUNT] = user_input[CONF_MODULE_COUNT]
+
+            return await self.async_step_device_menu()
 
         return self.async_show_form(
-            step_id="add_device",
+            step_id="communication",
             data_schema=vol.Schema(
                 {
-                    vol.Required(CONF_TYPE): vol.In(DEVICE_TYPES),
-                    vol.Required(CONF_NAME): str,
-                    vol.Required(CONF_ID): int,
-                    vol.Optional(CONF_EXTRA): str,
-                }
-            ),
-            errors=errors,
-        )
-
-    async def async_step_edit_device(
-        self, user_input: dict[str, Any] | None = None
-    ) -> config_entries.ConfigFlowResult:
-        """Select device to edit."""
-        if not self.data[CONF_DEVICES]:
-            return await self.async_step_main_menu()
-
-        if user_input:
-            self._edit_index = int(user_input["device_index"])
-            self._current_device = self.data[CONF_DEVICES][self._edit_index].copy()
-            return await self.async_step_edit_device_details()
-
-        devices = [
-            selector.SelectOptionDict(
-                value=str(idx), label=f"{dev[CONF_NAME]} (ID: {dev[CONF_ID]})"
-            )
-            for idx, dev in enumerate(self.data[CONF_DEVICES])
-        ]
-
-        return self.async_show_form(
-            step_id="edit_device",
-            data_schema=vol.Schema(
-                {
-                    vol.Required("device_index"): selector.SelectSelector(
-                        selector.SelectSelectorConfig(options=devices)
-                    )
-                }
-            ),
-        )
-
-    async def async_step_edit_device_details(
-        self, user_input: dict[str, Any] | None = None
-    ) -> config_entries.ConfigFlowResult:
-        """Edit device parameters."""
-
-        errors = {}
-
-        if user_input:
-            if (
-                check_extra_parameter(
-                    user_input.get(CONF_EXTRA), user_input.get(CONF_TYPE)
-                )
-                is None
-            ):
-                self.data[CONF_DEVICES][self._edit_index] = user_input
-                _LOGGER.debug("%s", user_input)
-                self._edit_index = 0
-                return await self.async_step_main_menu()
-            errors[CONF_TYPE] = "Bad binary sensor extra parameter!"
-
-        if self._current_device.get(CONF_EXTRA) is not None:
-            return self.async_show_form(
-                step_id="edit_device_details",
-                data_schema=vol.Schema(
-                    {
-                        vol.Required(
-                            CONF_TYPE, default=self._current_device[CONF_TYPE]
-                        ): vol.In(DEVICE_TYPES),
-                        vol.Required(
-                            CONF_NAME, default=self._current_device[CONF_NAME]
-                        ): str,
-                        vol.Required(
-                            CONF_ID, default=self._current_device[CONF_ID]
-                        ): int,
-                        vol.Optional(
-                            CONF_EXTRA, default=self._current_device.get(CONF_EXTRA)
-                        ): str,
-                    }
-                ),
-                errors=errors,
-            )
-        return self.async_show_form(
-            step_id="edit_device_details",
-            data_schema=vol.Schema(
-                {
-                    vol.Required(
-                        CONF_TYPE, default=self._current_device[CONF_TYPE]
-                    ): vol.In(DEVICE_TYPES),
-                    vol.Required(
-                        CONF_NAME, default=self._current_device[CONF_NAME]
-                    ): str,
-                    vol.Required(CONF_ID, default=self._current_device[CONF_ID]): int,
-                    vol.Optional(CONF_EXTRA): str,
+                    vol.Required(CONF_PORT, default=self._config_data[CONF_COMMUNICATION][CONF_PORT]): str,
+                    vol.Required(CONF_MODULE_COUNT, default=self._config_data[CONF_COMMUNICATION][CONF_MODULE_COUNT]): int,
                 }
             ),
             errors=errors,
         )
 
     async def async_step_finish(
-        self, user_input: dict[str, Any] | None = None
+        self,
+        user_input: dict[str, Any] | None=None,
     ) -> config_entries.ConfigFlowResult:
-        """Finish config flow."""
 
-        self.hass.config_entries.async_update_entry(
-            self.config_entry,
-            options=self.data,
+        return self.async_create_entry(
+            title=self._config_data[CONF_COMMUNICATION][CONF_PORT],
+            data=self._config_data
         )
-        return self.async_create_entry(title="", data={})
-
-    async def async_step_communication(
-        self, user_input: dict[str, Any] | None = None
-    ) -> config_entries.ConfigFlowResult:
-        """Show communication form."""
-        errors = {}
-        if user_input:
-            if not await ping_connection(user_input.get(CONF_PORT)):
-                errors[CONF_PORT] = "Unable to connect"
-            else:
-                self.data[CONF_COMMUNICATION][CONF_PORT] = user_input[CONF_PORT]
-                self.data[CONF_COMMUNICATION][CONF_MODULE_COUNT] = user_input[
-                    CONF_MODULE_COUNT
-                ]
-
-                return await self.async_step_main_menu()
-
-        return self.async_show_form(
-            step_id="communication",
-            data_schema=vol.Schema(
-                {
-                    vol.Required(
-                        CONF_PORT, default=self.data[CONF_COMMUNICATION][CONF_PORT]
-                    ): str,
-                    vol.Required(
-                        CONF_MODULE_COUNT,
-                        default=self.data[CONF_COMMUNICATION][CONF_MODULE_COUNT],
-                    ): int,
-                }
-            ),
-            errors=errors,
-        )
-
-def check_extra_parameter(
-    extra_parameter: Any | None,
-    device_type: Any | None,
-) -> str | None:
-    """Check extra parameter."""
-
-    if device_type == PLATFORM_BINARY_SENSOR:
-        if not extra_parameter in BINARY_SENSOR_DEVICE_CLASS:
-            return "Bad binary sensor extra parameter!"
-    elif device_type == PLATFORM_SWITCH:
-        if not extra_parameter in SWITCH_DEVICE_CLASS:
-            return "Bad Output extra parameter!"
-            
-    return None
-

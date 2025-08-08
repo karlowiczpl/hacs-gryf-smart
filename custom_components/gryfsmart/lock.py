@@ -101,4 +101,3 @@ class GryfConfigFlowLock(GryfConfigFlowEntity, GryfLockBase):
         self._config_entry = config_entry
         super().__init__(config_entry, device)
         self._device.subscribe(self.async_update)
-

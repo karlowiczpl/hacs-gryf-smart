@@ -1,0 +1,170 @@
+{
+    "config": {
+        "abort": {
+            "already_configured": "Already configured"
+        },
+        "error": {
+            "cannot_connect": "Unable to connect",
+            "invalid_auth": "Invalid credentials",
+            "unknown": "Unknown error"
+        },
+        "step": {
+            "add_device": {
+                "description": "Add a new device",
+                "title": "Add New Device"
+            },
+            "binary_sensor": {
+                "data": {
+                    "device_class": "Sensor type",
+                    "id": "Sensor ID",
+                    "name": "Name",
+                    "negation": "Invert logic"
+                },
+                "description": "Set up binary sensor",
+                "title": "Configure Binary Sensor"
+            },
+            "climate": {
+                "data": {
+                    "hysteresis_loop": "Hysteresis value",
+                    "name": "Name",
+                    "out_id": "Output ID",
+                    "temp_id": "Temperature sensor ID"
+                },
+                "description": "Set up climate control",
+                "title": "Configure Climate"
+            },
+            "communication": {
+                "data": {
+                    "module_count": "Number of modules",
+                    "port": "Serial port"
+                },
+                "description": "Modify serial connection or module count",
+                "title": "Update Communication Settings"
+            },
+            "cover": {
+                "data": {
+                    "id": "Cover ID",
+                    "name": "Name",
+                    "time": "Time to open/close"
+                },
+                "description": "Set up blinds or shutters",
+                "title": "Configure Cover"
+            },
+            "device_menu": {
+                "description": "Choose add/edit/remove",
+                "title": "Device Configuration Menu"
+            },
+            "edit_device": {
+                "data": {
+                    "device_index": "Device to edit"
+                },
+                "description": "Update existing device",
+                "title": "Edit Device"
+            },
+            "finish": {
+                "description": "Configuration completed",
+                "title": "Complete"
+            },
+            "gate": {
+                "data": {
+                    "id": "Gate ID",
+                    "name": "Name"
+                },
+                "description": "Set up gate control",
+                "title": "Configure Gate"
+            },
+            "input": {
+                "data": {
+                    "id": "Input ID",
+                    "name": "Name"
+                },
+                "description": "Set up digital input",
+                "title": "Configure Input"
+            },
+            "light": {
+                "data": {
+                    "id": "Light ID",
+                    "name": "Name"
+                },
+                "description": "Set up light control",
+                "title": "Configure Light"
+            },
+            "lock": {
+                "data": {
+                    "id": "Lock ID",
+                    "name": "Name"
+                },
+                "description": "Set up electronic lock",
+                "title": "Configure Lock"
+            },
+            "output": {
+                "data": {
+                    "device_class": "Output class",
+                    "id": "Output ID",
+                    "name": "Name"
+                },
+                "description": "Set up output",
+                "title": "Configure Switch Output"
+            },
+            "pwm": {
+                "data": {
+                    "id": "PWM ID",
+                    "name": "Name"
+                },
+                "description": "Set up PWM output",
+                "title": "Configure PWM Output"
+            },
+            "temperature": {
+                "data": {
+                    "id": "Sensor ID",
+                    "name": "Name"
+                },
+                "description": "Add temperature sensor",
+                "title": "Configure Temperature Sensor"
+            },
+            "user": {
+                "data": {
+                    "module_count": "Number of modules",
+                    "port": "Serial port"
+                },
+                "description": "Configure connection settings",
+                "title": "Communication Settings"
+            }
+        }
+    },
+    "options": {
+        "step": {
+            "add_device": {
+                "description": "Add a device",
+                "title": "Add Device"
+            },
+            "communication": {
+                "data": {
+                    "module_count": "Number of modules",
+                    "port": "Serial port"
+                },
+                "description": "Change port or module count",
+                "title": "Communication Settings"
+            },
+            "device_menu": {
+                "description": "Choose device action",
+                "title": "Device Menu"
+            },
+            "edit_device": {
+                "data": {
+                    "device_index": "Device to edit"
+                },
+                "description": "Edit a device",
+                "title": "Edit Device"
+            },
+            "finish": {
+                "description": "Configuration saved",
+                "title": "Finish"
+            },
+            "init": {
+                "description": "Modify after setup",
+                "title": "Gryf Smart Options"
+            }
+        }
+    }
+}

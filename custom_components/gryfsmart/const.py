@@ -24,6 +24,10 @@ CONF_GRYF_EXPERT = "gryf_expert"
 CONF_TEMP = "temp"
 CONF_OUT = "out"
 CONF_TIME = "time"
+CONF_NEGATION = "negation"
+CONF_TEMP_ID = "Sensor ID"
+CONF_OUT_ID = "Output ID"
+CONF_HYSTERESIS_LOOP = "hysteresis loop"
 
 PLATFORM_PWM = "pwm"
 PLATFORM_TEMPERATURE = "temperature"
@@ -57,7 +61,6 @@ CONFIG_FLOW_MENU_OPTIONS = {
 DEVICE_TYPES = {
     PLATFORM_LIGHT: "Lights",
     PLATFORM_SWITCH: "Output",
-    # Platform.SENSOR: "Input",
     PLATFORM_COVER: "Shutter",
     PLATFORM_BINARY_SENSOR: "Binary input",
     PLATFORM_LOCK: "Lock",
@@ -73,6 +76,17 @@ CONF_LINE_SENSOR_ICONS = {
     GRYF_OUT_NAME: ["mdi:message-arrow-left-outline", "mdi:message-arrow-left"],
 }
 
+CONFIG_FLOW_DEVICE_TYPES = {
+    PLATFORM_LIGHT: "Light",
+    PLATFORM_SWITCH: "Switch",
+    PLATFORM_BINARY_SENSOR: "Binary Sensor",
+    PLATFORM_COVER: "Cover",
+    PLATFORM_PWM: "Pwm",
+    PLATFORM_TEMPERATURE: "Temperature",
+
+    "device_menu": "Exit",
+}
+
 BINARY_SENSOR_DEVICE_CLASS = {
     "door": BinarySensorDeviceClass.DOOR,
     "garage door": BinarySensorDeviceClass.GARAGE_DOOR,
@@ -83,11 +97,17 @@ BINARY_SENSOR_DEVICE_CLASS = {
     "smoke": BinarySensorDeviceClass.SMOKE,
     "sound": BinarySensorDeviceClass.SOUND,
     "power": BinarySensorDeviceClass.POWER,
-    None: BinarySensorDeviceClass.OPENING,
+    "battery": BinarySensorDeviceClass.BATTERY,
+    "batery charging": BinarySensorDeviceClass.BATTERY_CHARGING,
+    "co": BinarySensorDeviceClass.CO,
+    "cold": BinarySensorDeviceClass.COLD,
+    "connectivity": BinarySensorDeviceClass.CONNECTIVITY,
+    "gas": BinarySensorDeviceClass.GAS,
+    "lock": BinarySensorDeviceClass.LOCK,
+    "moisture": BinarySensorDeviceClass.MOISTURE,
 }
 
 SWITCH_DEVICE_CLASS = {
-    None: SwitchDeviceClass.SWITCH,
     "switch": SwitchDeviceClass.SWITCH,
     "outlet": SwitchDeviceClass.OUTLET,
 }

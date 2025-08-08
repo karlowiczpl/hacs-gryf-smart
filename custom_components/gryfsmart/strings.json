@@ -1,0 +1,171 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Communication Settings",
+        "description": "Configure connection settings",
+        "data": {
+          "port": "Serial port",
+          "module_count": "Number of modules"
+        }
+      },
+      "communication": {
+        "title": "Update Communication Settings",
+        "description": "Modify serial connection or module count",
+        "data": {
+          "port": "Serial port",
+          "module_count": "Number of modules"
+        }
+      },
+      "device_menu": {
+        "title": "Device Configuration Menu",
+        "description": "Choose add/edit/remove"
+      },
+      "add_device": {
+        "title": "Add New Device",
+        "description": "Add a new device"
+      },
+      "edit_device": {
+        "title": "Edit Device",
+        "description": "Update existing device",
+        "data": {
+          "device_index": "Device to edit"
+        }
+      },
+      "finish": {
+        "title": "Complete",
+        "description": "Configuration completed"
+      },
+      "light": {
+        "title": "Configure Light",
+        "description": "Set up light control",
+        "data": {
+          "name": "Name",
+          "id": "Light ID"
+        }
+      },
+      "output": {
+        "title": "Configure Switch Output",
+        "description": "Set up output",
+        "data": {
+          "name": "Name",
+          "id": "Output ID",
+          "device_class": "Output class"
+        }
+      },
+      "binary_sensor": {
+        "title": "Configure Binary Sensor",
+        "description": "Set up binary sensor",
+        "data": {
+          "name": "Name",
+          "id": "Sensor ID",
+          "device_class": "Sensor type",
+          "negation": "Invert logic"
+        }
+      },
+      "cover": {
+        "title": "Configure Cover",
+        "description": "Set up blinds or shutters",
+        "data": {
+          "name": "Name",
+          "id": "Cover ID",
+          "time": "Time to open/close"
+        }
+      },
+      "lock": {
+        "title": "Configure Lock",
+        "description": "Set up electronic lock",
+        "data": {
+          "name": "Name",
+          "id": "Lock ID"
+        }
+      },
+      "climate": {
+        "title": "Configure Climate",
+        "description": "Set up climate control",
+        "data": {
+          "name": "Name",
+          "out_id": "Output ID",
+          "temp_id": "Temperature sensor ID",
+          "hysteresis_loop": "Hysteresis value"
+        }
+      },
+      "pwm": {
+        "title": "Configure PWM Output",
+        "description": "Set up PWM output",
+        "data": {
+          "name": "Name",
+          "id": "PWM ID"
+        }
+      },
+      "temperature": {
+        "title": "Configure Temperature Sensor",
+        "description": "Add temperature sensor",
+        "data": {
+          "name": "Name",
+          "id": "Sensor ID"
+        }
+      },
+      "input": {
+        "title": "Configure Input",
+        "description": "Set up digital input",
+        "data": {
+          "name": "Name",
+          "id": "Input ID"
+        }
+      },
+      "gate": {
+        "title": "Configure Gate",
+        "description": "Set up gate control",
+        "data": {
+          "name": "Name",
+          "id": "Gate ID"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Unable to connect",
+      "invalid_auth": "Invalid credentials",
+      "unknown": "Unknown error"
+    },
+    "abort": {
+      "already_configured": "Already configured"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Gryf Smart Options",
+        "description": "Modify after setup"
+      },
+      "communication": {
+        "title": "Communication Settings",
+        "description": "Change port or module count",
+        "data": {
+          "port": "Serial port",
+          "module_count": "Number of modules"
+        }
+      },
+      "device_menu": {
+        "title": "Device Menu",
+        "description": "Choose device action"
+      },
+      "add_device": {
+        "title": "Add Device",
+        "description": "Add a device"
+      },
+      "edit_device": {
+        "title": "Edit Device",
+        "description": "Edit a device",
+        "data": {
+          "device_index": "Device to edit"
+        }
+      },
+      "finish": {
+        "title": "Finish",
+        "description": "Configuration saved"
+      }
+    }
+  }
+}
+
