@@ -1,169 +1,169 @@
 {
     "config": {
         "abort": {
-            "already_configured": "Już Skonfigurowane"
+            "already_configured": "Już skonfigurowane"
         },
         "error": {
             "cannot_connect": "Nie można się połączyć",
             "invalid_auth": "Złe hasło",
-            "unknown": "Nieznany Error"
+            "unknown": "Nie znany error"
         },
         "step": {
             "add_device": {
-                "description": "Dodaj Nową Encje",
-                "title": "Dodaj nową encje"
+                "description": "Dodaj urządzenie",
+                "title": "Dodaj urządzenie"
             },
             "binary_sensor": {
                 "data": {
-                    "device_class": "Rodzaj Czujnika",
-                    "id": "ID czujnika",
+                    "device_class": "Typ Czujnika",
+                    "id": "Id",
                     "name": "Nazwa",
                     "negation": "Negacja"
                 },
-                "description": "Skonfiguruj Czujnik Binarny",
-                "title": "Skonfiguruj Czujnik Binarny"
+                "description": "Dodaj czujnik binarny",
+                "title": "Dodaj czujnik binarny"
             },
             "climate": {
                 "data": {
-                    "hysteresis_loop": "Hysteresis value",
-                    "name": "Name",
-                    "out_id": "Output ID",
-                    "temp_id": "Temperature sensor ID"
+                    "hysteresis_loop": "Wartość histerezy",
+                    "name": "Nazwa",
+                    "out_id": "Id wyjścia",
+                    "temp_id": "Id temometra"
                 },
-                "description": "Set up climate control",
-                "title": "Configure Climate"
+                "description": "Dodaj termostat",
+                "title": "Dodaj termostat"
             },
             "communication": {
                 "data": {
-                    "module_count": "Number of modules",
-                    "port": "Serial port"
+                    "module_count": "Ilość modułów",
+                    "port": "Port komunikacyjny"
                 },
-                "description": "Modify serial connection or module count",
-                "title": "Update Communication Settings"
+                "description": "Ustaw komunikacje",
+                "title": "Ustaw komunikacje"
             },
             "cover": {
                 "data": {
-                    "id": "Cover ID",
-                    "name": "Name",
-                    "time": "Time to open/close"
+                    "id": "Id",
+                    "name": "Nazwa",
+                    "time": "Czas otwierania/zamykania"
                 },
-                "description": "Set up blinds or shutters",
-                "title": "Configure Cover"
+                "description": "Dodaj rolety",
+                "title": "Dodaj rolety"
             },
             "device_menu": {
-                "description": "Choose add/edit/remove",
-                "title": "Device Configuration Menu"
+                "description": "Wybierz Edytowanie/usuwanie/dodawnie",
+                "title": "Menu konfiguracji"
             },
             "edit_device": {
                 "data": {
-                    "device_index": "Device to edit"
+                    "device_index": "Urządzenie do edycji"
                 },
-                "description": "Update existing device",
-                "title": "Edit Device"
+                "description": "Aktualizacja urządzenia",
+                "title": "Edytuj Urządzenie"
             },
             "finish": {
-                "description": "Configuration completed",
-                "title": "Complete"
+                "description": "Konfiguracja Zakończona",
+                "title": "Konfiguracja Zakończona"
             },
             "gate": {
                 "data": {
-                    "id": "Gate ID",
-                    "name": "Name"
+                    "id": "Id",
+                    "name": "Nazwa"
                 },
-                "description": "Set up gate control",
-                "title": "Configure Gate"
+                "description": "Dodaj Brame",
+                "title": "Dodaj Brame"
             },
             "input": {
                 "data": {
-                    "id": "Input ID",
-                    "name": "Name"
+                    "id": "Id",
+                    "name": "Nazwa"
                 },
-                "description": "Set up digital input",
-                "title": "Configure Input"
+                "description": "Dodaj Wejście",
+                "title": "Dodaj wejście"
             },
             "light": {
                 "data": {
-                    "id": "Light ID",
-                    "name": "Name"
+                    "id": "Id",
+                    "name": "Nazwa"
                 },
-                "description": "Set up light control",
-                "title": "Configure Light"
+                "description": "Dodaj Lampe",
+                "title": "Dodaj Lampe"
             },
             "lock": {
                 "data": {
-                    "id": "Lock ID",
-                    "name": "Name"
+                    "id": "Id",
+                    "name": "Nazwa"
                 },
-                "description": "Set up electronic lock",
-                "title": "Configure Lock"
+                "description": "Dodaj zamek",
+                "title": "Dodaj zamek"
             },
             "output": {
                 "data": {
-                    "device_class": "Output class",
-                    "id": "Output ID",
-                    "name": "Name"
+                    "device_class": "Typ Wyjścia",
+                    "id": "Id",
+                    "name": "Nazwa"
                 },
-                "description": "Set up output",
-                "title": "Configure Switch Output"
+                "description": "Dodaj wyjście",
+                "title": "Dodaj wyjście"
             },
             "pwm": {
                 "data": {
-                    "id": "PWM ID",
-                    "name": "Name"
+                    "id": "Id",
+                    "name": "Nazwa"
                 },
-                "description": "Set up PWM output",
-                "title": "Configure PWM Output"
+                "description": "Dodaj PWM",
+                "title": "Dodaj PWM"
             },
             "temperature": {
                 "data": {
-                    "id": "Sensor ID",
-                    "name": "Name"
+                    "id": "Id",
+                    "name": "Nazwa"
                 },
-                "description": "Add temperature sensor",
-                "title": "Configure Temperature Sensor"
+                "description": "Dodaj termometr",
+                "title": "Dodaj Termometr"
             },
             "user": {
                 "data": {
-                    "module_count": "Number of modules",
-                        "port": "Serial port"
+                    "module_count": "Ilość modułów w sieci",
+                    "port": "Port Komunikacyjny"
                 },
-                "description": "Configure connection settings",
-                "title": "Communication Settings"
+                "description": "Skonfiguruj Komunikacje",
+                "title": "Skonfiguruj Komunikacje"
             }
         }
     },
     "options": {
         "step": {
             "add_device": {
-                "description": "Wybierz typ encji do dodania",
-                "title": "Wybierz encje"
+                "description": "Dodaj Urządzenie",
+                "title": "Dodaj Urządzenie"
             },
             "communication": {
                 "data": {
-                    "module_count": "Number of modules",
-                    "port": "Serial port"
+                    "module_count": "Ilość modułów w sieci",
+                    "port": "port Komunikacyjny"
                 },
-                "description": "Change port or module count",
-                "title": "Communication Settings"
+                "description": "Skonfiguruj Komunikacje",
+                "title": "Skonfiguruj Komunikacje"
             },
             "device_menu": {
-                "description": "Wybiesz Dostępne akcje",
-                "title": "Wybierz co chcesz zrobić z tym urządzeniem"
+                "description": "Wybierz akcje urządzenia",
+                "title": "Wybierz akcje urządzenia"
             },
             "edit_device": {
                 "data": {
-                    "device_index": "Device to edit"
+                    "device_index": "Urządzenie do edycji"
                 },
-                "description": "Edit a device",
-                "title": "Edit Device"
+                "description": "Edytuj urządzenie",
+                "title": "Edytuj urządzenie"
             },
             "finish": {
-                "description": "Configuration saved",
-                "title": "Finish"
+                "description": "Zapisz konfiguracje",
+                "title": "Zapisz konfiguracje"
             },
             "init": {
-                "description": "Modify after setup",
-                "title": "Gryf Smart Options"
+                "description": "Rekonfiguracja",
+                "title": "Rekonfiguracja"
             }
         }
     }
