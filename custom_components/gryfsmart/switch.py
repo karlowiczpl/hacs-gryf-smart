@@ -32,7 +32,7 @@ async def async_setup_platform(
             conf.get(CONF_ID) % 10,
             hass.data[DOMAIN][CONF_API],
         )
-        switches.append(GryfYamlSwitch(device , conf.get(CONF_DEVICE_CLASS)))
+        switches.append(GryfYamlSwitch(device , conf.get(CONF_DEVICE_CLASS, "switch")))
 
     for conf in hass.data[DOMAIN].get(PLATFORM_GATE, []):
         device = GryfOutput(

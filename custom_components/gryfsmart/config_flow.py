@@ -525,7 +525,9 @@ class GryfSmartOptionsFlow(OptionsFlow, GryfSmartConfigFlow):
         user_input: dict[str, Any] | None=None,
     ) -> config_entries.ConfigFlowResult:
 
-        return self.async_create_entry(
-            title=self._config_data[CONF_COMMUNICATION][CONF_PORT],
-            data=self._config_data
+        self.hass.config_entries.async_update_entry(
+            self.config_entry,
+            options=self._config_data,
         )
+        return self.async_create_entry(title=self._config_data[CONF_COMMUNICATION][CONF_PORT], data={})
+
