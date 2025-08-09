@@ -103,3 +103,10 @@ class GryfYamlCover(GryfYamlEntity, GryfCoverBase):
 
         super().__init__(device)
         device.subscribe(self.async_update)
+
+class GryfConfigFlowCover(GryfConfigFlowEntity, GryfCoverBase):
+
+    def __init__(self, device: GryfCover, config_entry: ConfigEntry):
+        self._config_entry = config_entry
+        super().__init__(config_entry, device)
+        device.subscribe(self.async_update)

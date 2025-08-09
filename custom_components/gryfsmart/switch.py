@@ -61,7 +61,7 @@ async def async_setup_entry(
                 conf.get(CONF_ID) % 10,
                 config_entry.runtime_data[CONF_API],
             )
-            switches.append(GryfConfigFlowSwitch(device , config_entry , conf.get(CONF_EXTRA , None)))
+            switches.append(GryfConfigFlowSwitch(device , config_entry , conf.get(CONF_EXTRA, "switch")))
         if conf.get(CONF_TYPE) == PLATFORM_GATE:
             device = GryfOutput(
                 conf.get(CONF_NAME),
@@ -69,7 +69,7 @@ async def async_setup_entry(
                 conf.get(CONF_ID) % 10,
                 config_entry.runtime_data[CONF_API],
             )
-            switches.append(GryfGateConfigFlow(device, config_entry, conf.get(CONF_EXTRA)))
+            switches.append(GryfGateConfigFlow(device, config_entry, conf.get(CONF_EXTRA, "switch")))
 
     async_add_entities(switches)
     
