@@ -72,7 +72,7 @@ async def async_setup_entry(
                 conf.get(CONF_ID) % 10,
                 config_entry.runtime_data[CONF_API],
             )
-            switches.append(GryfConfigFlowSwitch(device , config_entry , conf.get(CONF_EXTRA, 0)))
+            switches.append(GryfConfigFlowSwitch(device , config_entry , conf.get(CONF_EXTRA, "switch")))
         if conf.get(CONF_TYPE) == Platforms.GATE:
             device = GryfOutput(
                 conf.get(CONF_NAME),
@@ -80,7 +80,7 @@ async def async_setup_entry(
                 conf.get(CONF_ID) % 10,
                 config_entry.runtime_data[CONF_API],
             )
-            switches.append(GryfGateConfigFlow(device, config_entry, conf.get(CONF_EXTRA, 0)))
+            switches.append(GryfGateConfigFlow(device, config_entry, conf.get(CONF_EXTRA, "switch")))
 
     async_add_entities(switches)
     
@@ -233,7 +233,7 @@ class GryfConfigFlowSwitch(GryfConfigFlowEntity , GryfSwitchBase):
         super().__init__(config_entry , device)
         self._device.subscribe(self.async_update)
 
-        self._attr_device_class = SWITCH_DEVICE_CLASS[device_class]
+        self._attr_device_class = device_class
 
 
 class GryfYamlSwitch(GryfYamlEntity , GryfSwitchBase):
@@ -249,4 +249,4 @@ class GryfYamlSwitch(GryfYamlEntity , GryfSwitchBase):
         super().__init__(device)
         self._device.subscribe(self.async_update)
 
-        self._attr_device_class = SWITCH_DEVICE_CLASS[device_class]
+        self._attr_device_class = device_class
