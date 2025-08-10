@@ -72,7 +72,7 @@ async def async_setup_entry(
                 conf.get(CONF_ID) % 10,
                 config_entry.runtime_data[CONF_API],
             )
-            switches.append(GryfConfigFlowSwitch(device , config_entry , conf.get(CONF_EXTRA, "switch")))
+            switches.append(GryfConfigFlowSwitch(device , config_entry , conf.get(CONF_EXTRA, 0)))
         if conf.get(CONF_TYPE) == Platforms.GATE:
             device = GryfOutput(
                 conf.get(CONF_NAME),
@@ -80,7 +80,7 @@ async def async_setup_entry(
                 conf.get(CONF_ID) % 10,
                 config_entry.runtime_data[CONF_API],
             )
-            switches.append(GryfGateConfigFlow(device, config_entry, conf.get(CONF_EXTRA, "switch")))
+            switches.append(GryfGateConfigFlow(device, config_entry, conf.get(CONF_EXTRA, 0)))
 
     async_add_entities(switches)
     
@@ -98,7 +98,8 @@ class GryfGateBase(SwitchEntity):
         self._output_state = is_on
         self._attr_is_on = is_on
 
-        self.async_write_ha_state()
+        if self.hass is not None:
+            self.async_write_ha_state()
 
     async def async_update_input(self, is_on):
         if is_on:
@@ -106,7 +107,8 @@ class GryfGateBase(SwitchEntity):
         else:
             self._attr_icon = "mdi:boom-gate"
 
-        self.async_write_ha_state()
+        if self.hass is not None:
+            self.async_write_ha_state()
 
     async def async_turn_on(self, **kwargs):
 
@@ -198,7 +200,8 @@ class GryfSwitchBase(SwitchEntity, RestoreEntity):
         """Update state."""
 
         self._is_on = is_on
-        self.async_write_ha_state()
+        if self.hass is not None:
+            self.async_write_ha_state()
 
     async def async_turn_on(self , **kwargs):
         """Turn on switch."""
