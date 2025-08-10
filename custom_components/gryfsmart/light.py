@@ -6,15 +6,21 @@ from pygryfsmart.device import _GryfDevice, GryfOutput, GryfPwm
 
 from homeassistant.components.light import ColorMode, LightEntity
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import CONF_TYPE, Platform
+from homeassistant.const import CONF_TYPE
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
 from homeassistant.helpers.restore_state import RestoreEntity
 
-from .const import CONF_API, CONF_DEVICES, CONF_ID, CONF_NAME, DOMAIN, PLATFORM_PWM 
 from .entity import GryfConfigFlowEntity, GryfYamlEntity
-
+from .const import (
+    CONF_API,
+    CONF_DEVICES,
+    CONF_ID,
+    CONF_NAME,
+    DOMAIN,
+    Platforms
+)
 
 async def async_setup_platform(
     hass: HomeAssistant,
@@ -27,7 +33,7 @@ async def async_setup_platform(
     lights = []
     pwm = []
 
-    for conf in hass.data[DOMAIN].get(Platform.LIGHT, {}):
+    for conf in hass.data[DOMAIN].get(Platforms.LIGHT, {}):
         device = GryfOutput(
             conf.get(CONF_NAME),
             conf.get(CONF_ID) // 10,
@@ -36,7 +42,7 @@ async def async_setup_platform(
         )
         lights.append(GryfYamlLight(device))
 
-    for conf in hass.data[DOMAIN].get(PLATFORM_PWM, {}):
+    for conf in hass.data[DOMAIN].get(Platforms.PWM, {}):
         device = GryfPwm(
             conf.get(CONF_NAME),
             conf.get(CONF_ID) // 10,
@@ -59,7 +65,7 @@ async def async_setup_entry(
     pwm = []
 
     for conf in config_entry.data[CONF_DEVICES]:
-        if conf.get(CONF_TYPE) == Platform.LIGHT:
+        if conf.get(CONF_TYPE) == Platforms.LIGHT:
             device = GryfOutput(
                 conf.get(CONF_NAME),
                 conf.get(CONF_ID) // 10,
@@ -67,7 +73,7 @@ async def async_setup_entry(
                 config_entry.runtime_data[CONF_API],
             )
             lights.append(GryfConfigFlowLight(device, config_entry))
-        elif conf.get(CONF_TYPE) == PLATFORM_PWM:
+        elif conf.get(CONF_TYPE) == Platforms.PWM:
             device = GryfPwm(
                 conf.get(CONF_NAME),
                 conf.get(CONF_ID) // 10,

@@ -7,26 +7,22 @@ import logging
 from pygryfsmart.api import GryfApi, GryfExpert
 
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant, ServiceCall
 from homeassistant.exceptions import ConfigEntryNotReady
 from homeassistant.helpers.discovery import async_load_platform
 from homeassistant.helpers.typing import ConfigType
 
-from .const import CONF_API, CONF_COMMUNICATION, CONF_DEVICE_DATA, CONF_PORT, DOMAIN, CONF_GRYF_EXPERT, CONF_MODULE_COUNT
-from .schema import CONFIG_SCHEMA as SCHEMA
-
-CONFIG_SCHEMA = SCHEMA
-
-_PLATFORMS: list[Platform] = [
-    Platform.LIGHT,
-    Platform.BINARY_SENSOR,
-    Platform.SENSOR,
-    Platform.CLIMATE,
-    Platform.COVER,
-    Platform.SWITCH,
-    Platform.LOCK
-]
+from .schema import CONFIG_SCHEMA
+from .const import (
+    CONF_API,
+    CONF_COMMUNICATION,
+    CONF_DEVICE_DATA,
+    CONF_PORT,
+    DOMAIN,
+    CONF_GRYF_EXPERT,
+    CONF_MODULE_COUNT,
+    HOMEASSISTANT_PLATFORMS,
+)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -74,7 +70,7 @@ async def async_setup(
     hass.services.async_register(DOMAIN, "gryf_expert", handle_gryf_expert)
     hass.services.async_register(DOMAIN, "search_modules", handle_search_modules)
 
-    for PLATFORM in _PLATFORMS:
+    for PLATFORM in HOMEASSISTANT_PLATFORMS:
         await async_load_platform(hass , PLATFORM , DOMAIN , None , config)
 
     return True
@@ -162,7 +158,7 @@ async def async_setup_entry(
     hass.services.async_register(DOMAIN, "gryf_expert", handle_gryf_expert)
     hass.services.async_register(DOMAIN, "search_modules", handle_search_modules)
 
-    await hass.config_entries.async_forward_entry_setups(entry, _PLATFORMS)
+    await hass.config_entries.async_forward_entry_setups(entry, HOMEASSISTANT_PLATFORMS)
 
     await api.async_update_states()
 
@@ -171,4 +167,4 @@ async def async_setup_entry(
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Unload a config entry."""
 
-    return await hass.config_entries.async_unload_platforms(entry, _PLATFORMS)
+    return await hass.config_entries.async_unload_platforms(entry, HOMEASSISTANT_PLATFORMS)

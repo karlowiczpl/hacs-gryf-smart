@@ -1,7 +1,6 @@
 """Define the base entity for the Gryf Smart integration."""
 
 from __future__ import annotations
-from typing import Dict
 
 from pygryfsmart.api import GryfApi
 from pygryfsmart.device import _GryfDevice

@@ -1,25 +1,32 @@
 """Handle the Gryf Smart Climate platform."""
 
 from typing import Any
-import asyncio
-import logging
 
-from homeassistant.components.switch import async_setup_entry
 from pygryfsmart.device import _GryfDevice, GryfThermostat
 
-from homeassistant.components import climate
-from homeassistant.components.climate import ClimateEntity, ClimateEntityDescription, ClimateEntityFeature, UnitOfTemperature
+from homeassistant.components.climate import ClimateEntity, ClimateEntityFeature, UnitOfTemperature
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import Platform, CONF_TYPE, ATTR_TEMPERATURE
+from homeassistant.const import CONF_TYPE, ATTR_TEMPERATURE
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
 from homeassistant.components.climate.const import HVACAction, HVACMode
 
-from .const import CONF_API, CONF_DEVICE_CLASS, CONF_DEVICES, CONF_EXTRA, CONF_ID, CONF_NAME, CONF_OUT, CONF_TEMP, DOMAIN, PLATFORM_CLIMATE, SWITCH_DEVICE_CLASS, NORMAL_HEATING_MODE, SLOWEST_HEATING_MODE, THE_SLOWEST_HEATING_MODE, SLOWEST_HEATING_MODE_DIFFERENTIAL, THE_SLOWEST_HEATING_MODE_DIFFERENTIAL
 from .entity import GryfYamlEntity, GryfConfigFlowEntity
-
-_LOGGER = logging.getLogger(__name__)
+from .const import (
+    DOMAIN,
+    CONF_API,
+    CONF_DEVICES,
+    CONF_EXTRA,
+    CONF_ID,
+    CONF_NAME,
+    CONF_OUT,
+    CONF_TEMP,
+    NORMAL_HEATING_MODE,
+    SLOWEST_HEATING_MODE,
+    THE_SLOWEST_HEATING_MODE,
+    Platforms
+)
 
 async def async_setup_platform(
     hass: HomeAssistant,
@@ -31,7 +38,7 @@ async def async_setup_platform(
 
     climates = []
 
-    for conf in hass.data[DOMAIN].get(PLATFORM_CLIMATE, []):
+    for conf in hass.data[DOMAIN].get(Platforms.CLIMATE, []):
         device = GryfThermostat(
             conf.get(CONF_NAME),
             conf.get(CONF_OUT) // 10,
@@ -52,7 +59,7 @@ async def async_setup_entry(
 
     climates = []
     for conf in config_entry.data[CONF_DEVICES]:
-        if conf.get(CONF_TYPE) == PLATFORM_CLIMATE:
+        if conf.get(CONF_TYPE) == Platforms.CLIMATE:
             device = GryfThermostat(
                 conf.get(CONF_NAME),
                 conf.get(CONF_ID) // 10,

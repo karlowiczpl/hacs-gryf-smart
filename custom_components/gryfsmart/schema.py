@@ -6,14 +6,6 @@ from homeassistant.helpers import config_validation as cv
 
 from .const import (
     DOMAIN,
-    PLATFORM_BINARY_SENSOR,
-    PLATFORM_CLIMATE,
-    PLATFORM_COVER,
-    PLATFORM_INPUT,
-    PLATFORM_LIGHT,
-    PLATFORM_PWM,
-    PLATFORM_SWITCH,
-    PLATFORM_GATE,
     CONF_TEMP,
     CONF_OUT,
     CONF_INPUTS,
@@ -23,6 +15,7 @@ from .const import (
     CONF_PORT,
     CONF_DEVICE_CLASS,
     CONF_TIME,
+    Platforms
 )
 
 STANDARD_SCHEMA = vol.Schema(
@@ -66,14 +59,14 @@ CONFIG_SCHEMA = vol.Schema(
             {
                 vol.Required(CONF_PORT): cv.string,
                 vol.Required(CONF_MODULE_COUNT): cv.positive_int,
-                vol.Optional(PLATFORM_PWM): vol.All(cv.ensure_list, [STANDARD_SCHEMA]),
-                vol.Optional(PLATFORM_LIGHT): vol.All(cv.ensure_list , [STANDARD_SCHEMA]),
-                vol.Optional(PLATFORM_INPUT): vol.All(cv.ensure_list , [STANDARD_SCHEMA]),
-                vol.Optional(PLATFORM_BINARY_SENSOR): vol.All(cv.ensure_list , [DEVICE_CLASS_SCHEMA]),
-                vol.Optional(PLATFORM_SWITCH): vol.All(cv.ensure_list , [DEVICE_CLASS_SCHEMA]),
-                vol.Optional(PLATFORM_CLIMATE): vol.All(cv.ensure_list , [CLIMATE_SCHEMA]),
-                vol.Optional(PLATFORM_COVER): vol.All(cv.ensure_list , [COVER_SCHEMA]),
-                vol.Optional(PLATFORM_GATE): vol.All(cv.ensure_list , [GATE_SCHEMA]),
+                vol.Optional(Platforms.PWM): vol.All(cv.ensure_list, [STANDARD_SCHEMA]),
+                vol.Optional(Platforms.LIGHT): vol.All(cv.ensure_list , [STANDARD_SCHEMA]),
+                vol.Optional(Platforms.INPUT): vol.All(cv.ensure_list , [STANDARD_SCHEMA]),
+                vol.Optional(Platforms.BINARY_SENSOR): vol.All(cv.ensure_list , [DEVICE_CLASS_SCHEMA]),
+                vol.Optional(Platforms.SWITCH): vol.All(cv.ensure_list , [DEVICE_CLASS_SCHEMA]),
+                vol.Optional(Platforms.CLIMATE): vol.All(cv.ensure_list , [CLIMATE_SCHEMA]),
+                vol.Optional(Platforms.COVER): vol.All(cv.ensure_list , [COVER_SCHEMA]),
+                vol.Optional(Platforms.GATE): vol.All(cv.ensure_list , [GATE_SCHEMA]),
             }
         )
     },

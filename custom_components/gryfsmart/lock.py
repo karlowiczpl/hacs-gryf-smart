@@ -1,11 +1,8 @@
 """Hanlde the GryfSmart Lock platform functionality."""
 
-from typing import Any
-import asyncio
-
 from pygryfsmart.device import _GryfDevice, GryfOutput
 
-from homeassistant.components.lock import LockEntity, LockEntityDescription, LockEntityFeature
+from homeassistant.components.lock import LockEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.const import CONF_TYPE
@@ -13,16 +10,13 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
 
 from .entity import GryfConfigFlowEntity, GryfYamlEntity
-
 from .const import (
     CONF_API,
-    CONF_DEVICE_CLASS,
     CONF_DEVICES,
-    CONF_EXTRA,
     CONF_ID,
     CONF_NAME,
     DOMAIN,
-    PLATFORM_LOCK,
+    Platforms,
 )
 
 async def async_setup_platform(
@@ -34,7 +28,7 @@ async def async_setup_platform(
     """Set up the switch platform."""
 
     locks = []
-    for conf in hass.data[DOMAIN].get(PLATFORM_LOCK, []):
+    for conf in hass.data[DOMAIN].get(Platforms.LOCK, []):
         device = GryfOutput(
             conf.get(CONF_NAME),
             conf.get(CONF_ID) // 10,
@@ -51,7 +45,7 @@ async def async_setup_entry(
 
     locks = []
     for conf in config_entry.data[CONF_DEVICES]:
-        if conf.get(CONF_TYPE) == PLATFORM_LOCK:
+        if conf.get(CONF_TYPE) == Platforms.LOCK:
             device = GryfOutput(
                 conf.get(CONF_NAME),
                 conf.get(CONF_ID) // 10,

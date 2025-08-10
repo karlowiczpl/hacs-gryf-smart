@@ -1,20 +1,25 @@
 """Handle the Gryf Smart Cover platform funtionality."""
 
-import asyncio
-from typing import Any
-
-from pygryfsmart.device import _GryfDevice, GryfCover, GryfOutput
+from pygryfsmart.device import GryfCover
 
 from homeassistant.components.cover import CoverEntity, CoverDeviceClass, CoverEntityFeature
-from homeassistant.components.button import ButtonEntity
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import CONF_DEVICE, CONF_TYPE, Platform
+from homeassistant.const import CONF_TYPE
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
 
-from .const import CONF_API, CONF_DEVICES, CONF_ID, CONF_EXTRA, CONF_NAME, DOMAIN, PLATFORM_COVER, CONF_TIME, PLATFORM_GATE
 from .entity import GryfConfigFlowEntity, GryfYamlEntity
+from .const import (
+    CONF_API,
+    CONF_DEVICES,
+    CONF_ID,
+    CONF_EXTRA,
+    CONF_NAME,
+    CONF_TIME,
+    DOMAIN,
+    Platforms,
+)
 
 async def async_setup_platform(
     hass: HomeAssistant,
@@ -26,7 +31,7 @@ async def async_setup_platform(
 
     covers = []
 
-    for conf in hass.data[DOMAIN].get(PLATFORM_COVER, {}):
+    for conf in hass.data[DOMAIN].get(Platforms.COVER, {}):
         device = GryfCover(
             conf.get(CONF_NAME),
             conf.get(CONF_ID) // 10,
@@ -46,7 +51,7 @@ async def async_setup_entry(
 
     covers = []
     for conf in config_entry.data[CONF_DEVICES]:
-        if conf.get(CONF_TYPE) == PLATFORM_COVER:
+        if conf.get(CONF_TYPE) == Platforms.COVER:
             device = GryfCover(
                 conf.get(CONF_NAME),
                 conf.get(CONF_ID) // 10,
@@ -55,8 +60,6 @@ async def async_setup_entry(
                 config_entry.runtime_data[CONF_API],
             )
             covers.append(GryfConfigFlowCover(device, config_entry))
-        if conf.get(CONF_TYPE) == PLATFORM_GATE:
-            pass
 
     async_add_entities(covers)
 

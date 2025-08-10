@@ -24,8 +24,7 @@ from .const import (
     DOMAIN,
     GRYF_IN_NAME,
     GRYF_OUT_NAME,
-    PLATFORM_INPUT,
-    PLATFORM_TEMPERATURE,
+    Platforms,
 )
 from .entity import GryfConfigFlowEntity, GryfYamlEntity
 
@@ -63,7 +62,7 @@ async def async_setup_platform(
 
     inputs = []
 
-    for conf in hass.data[DOMAIN].get(PLATFORM_INPUT, {}):
+    for conf in hass.data[DOMAIN].get(Platforms.INPUT, {}):
         device = GryfInput(
             conf.get(CONF_NAME),
             conf.get(CONF_ID) // 10,
@@ -109,7 +108,7 @@ async def async_setup_entry(
     temperature = []
 
     for conf in config_entry.data[CONF_DEVICES]:
-        if conf.get(CONF_TYPE) == PLATFORM_INPUT:
+        if conf.get(CONF_TYPE) == Platforms.INPUT:
             device = GryfInput(
                 conf.get(CONF_NAME),
                 conf.get(CONF_ID) // 10,
@@ -117,7 +116,7 @@ async def async_setup_entry(
                 config_entry.runtime_data[CONF_API],
             )
             inputs.append(GryfConfigFlowInput(device, config_entry))
-        if conf.get(CONF_TYPE) == PLATFORM_TEMPERATURE:
+        if conf.get(CONF_TYPE) == Platforms.TEMPERATURE:
             temperature_device = GryfTemperature(
                 conf.get(CONF_NAME),
                 conf.get(CONF_ID) // 10,

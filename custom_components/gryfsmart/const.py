@@ -29,16 +29,41 @@ CONF_TEMP_ID = "Sensor ID"
 CONF_OUT_ID = "Output ID"
 CONF_HYSTERESIS_LOOP = "hysteresis loop"
 
-PLATFORM_PWM = "pwm"
-PLATFORM_TEMPERATURE = "temperature"
-PLATFORM_INPUT = "input"
-PLATFORM_LIGHT = "light"
-PLATFORM_BINARY_SENSOR = "binary_sensor"
-PLATFORM_SWITCH = "output"
-PLATFORM_CLIMATE = "climate"
-PLATFORM_LOCK = "lock"
-PLATFORM_COVER = "cover"
-PLATFORM_GATE = "gate"
+class Platforms():
+    PWM = "pwm"
+    TEMPERATURE = "temperature"
+    INPUT = "input"
+    LIGHT = "light"
+    BINARY_SENSOR = "binary_sensor"
+    SWITCH = "output"
+    CLIMATE = "climate"
+    LOCK = "lock"
+    COVER = "cover"
+    GATE = "gate"
+
+    PUBLIC_NAMES = {
+        LIGHT: "Light",
+        SWITCH: "Output",
+        COVER: "Shutter",
+        BINARY_SENSOR: "Binary input",
+        LOCK: "Lock",
+        CLIMATE: "Thermostat",
+        PWM: "PWM",
+        TEMPERATURE: "Termometr",
+        INPUT: "Input",
+        GATE: "Gate",
+        "device_menu": "exit",
+    }
+
+HOMEASSISTANT_PLATFORMS: list[Platform] = [
+    Platform.LIGHT,
+    Platform.BINARY_SENSOR,
+    Platform.SENSOR,
+    Platform.CLIMATE,
+    Platform.COVER,
+    Platform.SWITCH,
+    Platform.LOCK
+]
 
 DEFAULT_PORT = "/dev/ttyUSB0"
 GRYF_IN_NAME = "Gryf IN"
@@ -58,37 +83,10 @@ CONFIG_FLOW_MENU_OPTIONS = {
     "finish": "Finish",
 }
 
-DEVICE_TYPES = {
-    PLATFORM_LIGHT: "Lights",
-    PLATFORM_SWITCH: "Output",
-    PLATFORM_COVER: "Shutter",
-    PLATFORM_BINARY_SENSOR: "Binary input",
-    PLATFORM_LOCK: "Lock",
-    PLATFORM_CLIMATE: "Thermostat",
-    PLATFORM_PWM: "PWM",
-    PLATFORM_TEMPERATURE: "Termometr",
-    PLATFORM_INPUT: "Input",
-    PLATFORM_GATE: "Gate",
-}
 
 CONF_LINE_SENSOR_ICONS = {
     GRYF_IN_NAME: ["mdi:message-arrow-right-outline", "mdi:message-arrow-right"],
     GRYF_OUT_NAME: ["mdi:message-arrow-left-outline", "mdi:message-arrow-left"],
-}
-
-CONFIG_FLOW_DEVICE_TYPES = {
-    PLATFORM_LIGHT: "Light",
-    PLATFORM_SWITCH: "Switch",
-    PLATFORM_BINARY_SENSOR: "Binary Sensor",
-    PLATFORM_COVER: "Cover",
-    PLATFORM_PWM: "Pwm",
-    PLATFORM_TEMPERATURE: "Temperature",
-    PLATFORM_CLIMATE: "Thermostat",
-    PLATFORM_LOCK: "Lock",
-    PLATFORM_INPUT: "input",
-    PLATFORM_GATE: "gate",
-
-    "device_menu": "Exit",
 }
 
 BINARY_SENSOR_DEVICE_CLASS = {

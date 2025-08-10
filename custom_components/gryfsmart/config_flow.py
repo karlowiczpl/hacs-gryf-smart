@@ -1,7 +1,5 @@
 """Handle the configuration flow for the Gryf Smart integration."""
 
-import logging
-from types import MappingProxyType
 from typing import Any
 
 import voluptuous as vol
@@ -33,22 +31,9 @@ from .const import (
     DOMAIN,
     SWITCH_DEVICE_CLASS,
 
-    PLATFORM_BINARY_SENSOR,
-    PLATFORM_SWITCH,
-    PLATFORM_LIGHT,
-    PLATFORM_COVER,
-    PLATFORM_LOCK,
-    PLATFORM_CLIMATE,
-    PLATFORM_PWM,
-    PLATFORM_TEMPERATURE,
-    PLATFORM_INPUT,
-    PLATFORM_GATE,
-
     CONFIG_FLOW_MENU_OPTIONS,
-    CONFIG_FLOW_DEVICE_TYPES,
+    Platforms
 )
-
-_LOGGER = logging.getLogger(__name__)
 
 class GryfSmartConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     """Gryf Smart ConfigFlow."""
@@ -71,16 +56,16 @@ class GryfSmartConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         self._last_name = ""
 
         self._editing_platform_function = {
-            PLATFORM_PWM: self.async_step_pwm,
-            PLATFORM_TEMPERATURE: self.async_step_temperature,
-            PLATFORM_INPUT: self.async_step_input,
-            PLATFORM_LIGHT: self.async_step_light,
-            PLATFORM_BINARY_SENSOR: self.async_step_binary_sensor,
-            PLATFORM_SWITCH: self.async_step_output,
-            PLATFORM_CLIMATE: self.async_step_climate,
-            PLATFORM_LOCK: self.async_step_lock,
-            PLATFORM_COVER: self.async_step_cover,
-            PLATFORM_GATE: self.async_step_gate,
+            Platforms.PWM: self.async_step_pwm,
+            Platforms.TEMPERATURE: self.async_step_temperature,
+            Platforms.INPUT: self.async_step_input,
+            Platforms.LIGHT: self.async_step_light,
+            Platforms.BINARY_SENSOR: self.async_step_binary_sensor,
+            Platforms.SWITCH: self.async_step_output,
+            Platforms.CLIMATE: self.async_step_climate,
+            Platforms.LOCK: self.async_step_lock,
+            Platforms.COVER: self.async_step_cover,
+            Platforms.GATE: self.async_step_gate,
         }       
 
     async def async_step_user(
@@ -132,7 +117,7 @@ class GryfSmartConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         return self.async_show_menu(
             step_id="add_device",
-            menu_options=CONFIG_FLOW_DEVICE_TYPES,
+            menu_options=Platforms.PUBLIC_NAMES,
         )
 
     async def async_step_light(
@@ -144,7 +129,7 @@ class GryfSmartConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
             if user_input[CONF_ID] and user_input[CONF_NAME]:
                 entity_data = {
-                    CONF_TYPE: PLATFORM_LIGHT,
+                    CONF_TYPE: Platforms.LIGHT,
                     CONF_ID: user_input[CONF_ID],
                     CONF_NAME: user_input[CONF_NAME],
                 }
@@ -154,7 +139,7 @@ class GryfSmartConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 return await self.async_step_add_device(None)
 
         return self.async_show_form(
-            step_id=PLATFORM_LIGHT,
+            step_id=Platforms.LIGHT,
             data_schema=vol.Schema(
                 {
                     vol.Optional(CONF_NAME, default=edited[CONF_NAME] if edited else ""): str, 
@@ -172,7 +157,7 @@ class GryfSmartConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
             if user_input[CONF_NAME] and user_input[CONF_ID]:
                 entity_data = {
-                    CONF_TYPE: PLATFORM_SWITCH,
+                    CONF_TYPE: Platforms.SWITCH,
                     CONF_ID: user_input[CONF_ID],
                     CONF_NAME: user_input[CONF_NAME],
                     CONF_EXTRA: user_input[CONF_DEVICE_CLASS],
@@ -183,7 +168,7 @@ class GryfSmartConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 return await self.async_step_add_device(None)
 
         return self.async_show_form(
-            step_id=PLATFORM_SWITCH,
+            step_id=Platforms.SWITCH,
             data_schema=vol.Schema(
                 {
                     vol.Optional(CONF_NAME, default=edited[CONF_NAME] if edited else self._last_name): str, 
@@ -202,7 +187,7 @@ class GryfSmartConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
             if user_input[CONF_ID] and user_input[CONF_NAME]:
                 entity_data = {
-                    CONF_TYPE: PLATFORM_BINARY_SENSOR,
+                    CONF_TYPE: Platforms.BINARY_SENSOR,
                     CONF_ID: user_input[CONF_ID],
                     CONF_NAME: user_input[CONF_NAME],
                     CONF_EXTRA: user_input[CONF_DEVICE_CLASS],
@@ -214,7 +199,7 @@ class GryfSmartConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 return await self.async_step_add_device(None)
 
         return self.async_show_form(
-            step_id=PLATFORM_BINARY_SENSOR,
+            step_id=Platforms.BINARY_SENSOR,
             data_schema=vol.Schema(
                 {
                     vol.Optional(CONF_NAME, default=edited[CONF_NAME] if edited else self._last_name): str, 
@@ -234,7 +219,7 @@ class GryfSmartConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
             if user_input[CONF_ID] and user_input[CONF_NAME]:
                 entity_data = {
-                    CONF_TYPE: PLATFORM_COVER,
+                    CONF_TYPE: Platforms.COVER,
                     CONF_ID: user_input[CONF_ID],
                     CONF_NAME: user_input[CONF_NAME],
                     CONF_EXTRA: user_input[CONF_TIME],
@@ -245,7 +230,7 @@ class GryfSmartConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 return await self.async_step_add_device(None)
 
         return self.async_show_form(
-            step_id=PLATFORM_COVER,
+            step_id=Platforms.COVER,
             data_schema=vol.Schema(
                 {
                     vol.Optional(CONF_NAME, default=edited[CONF_NAME] if edited else self._last_name): str, 
@@ -264,7 +249,7 @@ class GryfSmartConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
             if user_input[CONF_ID] and user_input[CONF_NAME]:
                 entity_data = {
-                    CONF_TYPE: PLATFORM_LOCK,
+                    CONF_TYPE: Platforms.LOCK,
                     CONF_ID: user_input[CONF_ID],
                     CONF_NAME: user_input[CONF_NAME],
                 }
@@ -274,7 +259,7 @@ class GryfSmartConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 return await self.async_step_add_device(None)
 
         return self.async_show_form(
-            step_id=PLATFORM_LOCK,
+            step_id=Platforms.LOCK,
             data_schema=vol.Schema(
                 {
                     vol.Optional(CONF_NAME, default=edited[CONF_NAME] if edited else self._last_name): str, 
@@ -292,7 +277,7 @@ class GryfSmartConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
             if user_input[CONF_OUT_ID] and user_input[CONF_NAME]:
                 entity_data = {
-                    CONF_TYPE: PLATFORM_CLIMATE,
+                    CONF_TYPE: Platforms.CLIMATE,
                     CONF_ID: user_input[CONF_OUT_ID],
                     CONF_EXTRA: user_input[CONF_TEMP_ID],
                     CONF_HYSTERESIS_LOOP: user_input[CONF_HYSTERESIS_LOOP],
@@ -304,7 +289,7 @@ class GryfSmartConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 return await self.async_step_add_device(None)
 
         return self.async_show_form(
-            step_id=PLATFORM_CLIMATE,
+            step_id=Platforms.CLIMATE,
             data_schema=vol.Schema(
                 {
                     vol.Optional(CONF_NAME, default=edited[CONF_NAME] if edited else self._last_name): str, 
@@ -324,7 +309,7 @@ class GryfSmartConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
             if user_input[CONF_ID] and user_input[CONF_NAME]:
                 entity_data = {
-                    CONF_TYPE: PLATFORM_PWM,
+                    CONF_TYPE: Platforms.PWM,
                     CONF_ID: user_input[CONF_ID],
                     CONF_NAME: user_input[CONF_NAME],
                 }
@@ -334,7 +319,7 @@ class GryfSmartConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 return await self.async_step_add_device(None)
 
         return self.async_show_form(
-            step_id=PLATFORM_PWM,
+            step_id=Platforms.PWM,
             data_schema=vol.Schema(
                 {
                     vol.Optional(CONF_NAME, default=edited[CONF_NAME] if edited else self._last_name): str, 
@@ -352,7 +337,7 @@ class GryfSmartConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
             if user_input[CONF_ID] and user_input[CONF_NAME]:
                 entity_data = {
-                    CONF_TYPE: PLATFORM_TEMPERATURE,
+                    CONF_TYPE: Platforms.TEMPERATURE,
                     CONF_ID: user_input[CONF_ID],
                     CONF_NAME: user_input[CONF_NAME],
                 }
@@ -362,7 +347,7 @@ class GryfSmartConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 return await self.async_step_add_device(None)
 
         return self.async_show_form(
-            step_id=PLATFORM_TEMPERATURE,
+            step_id=Platforms.TEMPERATURE,
             data_schema=vol.Schema(
                 {
                     vol.Optional(CONF_NAME, default=edited[CONF_NAME] if edited else self._last_name): str, 
@@ -380,7 +365,7 @@ class GryfSmartConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
             if user_input[CONF_ID] and user_input[CONF_NAME]:
                 entity_data = {
-                    CONF_TYPE: PLATFORM_INPUT,
+                    CONF_TYPE: Platforms.INPUT,
                     CONF_ID: user_input[CONF_ID],
                     CONF_NAME: user_input[CONF_NAME],
                 }
@@ -390,7 +375,7 @@ class GryfSmartConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 return await self.async_step_add_device(None)
 
         return self.async_show_form(
-            step_id=PLATFORM_INPUT,
+            step_id=Platforms.INPUT,
             data_schema=vol.Schema(
                 {
                     vol.Optional(CONF_NAME, default=edited[CONF_NAME] if edited else self._last_name): str, 
@@ -408,7 +393,7 @@ class GryfSmartConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
             if user_input[CONF_ID] and user_input[CONF_NAME]:
                 entity_data = {
-                    CONF_TYPE: PLATFORM_GATE,
+                    CONF_TYPE: Platforms.GATE,
                     CONF_ID: user_input[CONF_ID],
                     CONF_NAME: user_input[CONF_NAME],
                 }
@@ -418,7 +403,7 @@ class GryfSmartConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 return await self.async_step_add_device(None)
 
         return self.async_show_form(
-            step_id=PLATFORM_GATE,
+            step_id=Platforms.GATE,
             data_schema=vol.Schema(
                 {
                     vol.Optional(CONF_NAME, default=edited[CONF_NAME] if edited else self._last_name): str, 

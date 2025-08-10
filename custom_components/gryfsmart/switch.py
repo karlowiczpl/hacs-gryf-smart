@@ -4,16 +4,27 @@ import asyncio
 from pygryfsmart import GryfApi
 from pygryfsmart.device import _GryfDevice, GryfInput , GryfOutput
 
-from homeassistant.components.switch import SwitchEntity , SwitchDeviceClass, SwitchEntityDescription
+from homeassistant.components.switch import SwitchEntity , SwitchDeviceClass
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import Platform , CONF_TYPE
+from homeassistant.const import CONF_TYPE
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import ConfigType , DiscoveryInfoType
 from homeassistant.helpers.restore_state import RestoreEntity
 
-from .const import CONF_API, CONF_DEVICE_CLASS , CONF_DEVICES, CONF_EXTRA , CONF_ID, CONF_INPUTS , CONF_NAME , DOMAIN, PLATFORM_GATE, PLATFORM_SWITCH, SWITCH_DEVICE_CLASS, PLATFORM_SWITCH
 from .entity import GryfYamlEntity , GryfConfigFlowEntity
+from .const import (
+    CONF_API,
+    CONF_DEVICE_CLASS,
+    CONF_DEVICES,
+    CONF_EXTRA,
+    CONF_ID,
+    CONF_INPUTS,
+    CONF_NAME,
+    DOMAIN,
+    SWITCH_DEVICE_CLASS,
+    Platforms
+)
 
 async def async_setup_platform(
     hass: HomeAssistant,
@@ -25,7 +36,7 @@ async def async_setup_platform(
 
     switches = []
 
-    for conf in hass.data[DOMAIN].get(PLATFORM_SWITCH, []):
+    for conf in hass.data[DOMAIN].get(Platforms.SWITCH, []):
         device = GryfOutput(
             conf.get(CONF_NAME),
             conf.get(CONF_ID) // 10,
@@ -34,7 +45,7 @@ async def async_setup_platform(
         )
         switches.append(GryfYamlSwitch(device , conf.get(CONF_DEVICE_CLASS, "switch")))
 
-    for conf in hass.data[DOMAIN].get(PLATFORM_GATE, []):
+    for conf in hass.data[DOMAIN].get(Platforms.GATE, []):
         device = GryfOutput(
             conf.get(CONF_NAME),
             conf.get(CONF_ID) // 10,
@@ -54,7 +65,7 @@ async def async_setup_entry(
 
     switches = []
     for conf in config_entry.data[CONF_DEVICES]:
-        if conf.get(CONF_TYPE) == PLATFORM_SWITCH:
+        if conf.get(CONF_TYPE) == Platforms.SWITCH:
             device = GryfOutput(
                 conf.get(CONF_NAME),
                 conf.get(CONF_ID) // 10,
@@ -62,7 +73,7 @@ async def async_setup_entry(
                 config_entry.runtime_data[CONF_API],
             )
             switches.append(GryfConfigFlowSwitch(device , config_entry , conf.get(CONF_EXTRA, "switch")))
-        if conf.get(CONF_TYPE) == PLATFORM_GATE:
+        if conf.get(CONF_TYPE) == Platforms.GATE:
             device = GryfOutput(
                 conf.get(CONF_NAME),
                 conf.get(CONF_ID) // 10,

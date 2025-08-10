@@ -7,7 +7,6 @@ from homeassistant.components.binary_sensor import (
     BinarySensorEntity,
 )
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
@@ -24,7 +23,7 @@ from .const import (
     CONF_DEVICE_CLASS,
 
     DOMAIN,
-    PLATFORM_BINARY_SENSOR,
+    Platforms
 )
 from .entity import GryfConfigFlowEntity , GryfYamlEntity
 
@@ -38,7 +37,7 @@ async def async_setup_platform(
 
     binary_sensors = []
 
-    for conf in hass.data[DOMAIN].get(PLATFORM_BINARY_SENSOR, {}):
+    for conf in hass.data[DOMAIN].get(Platforms.BINARY_SENSOR, {}):
         device = GryfInput(
             conf.get(CONF_NAME),
             conf.get(CONF_ID) // 10,
@@ -60,7 +59,7 @@ async def async_setup_entry(
     binary_sensors = []
 
     for conf in config_entry.data[CONF_DEVICES]:
-        if conf.get(CONF_TYPE) == Platform.BINARY_SENSOR:
+        if conf.get(CONF_TYPE) == Platforms.BINARY_SENSOR:
             device = GryfInput(
                 conf.get(CONF_NAME),
                 conf.get(CONF_ID) // 10,
