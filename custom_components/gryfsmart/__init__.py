@@ -39,6 +39,7 @@ async def async_setup(
         api = GryfApi(config[DOMAIN][CONF_PORT])
         await api.start_connection()
         api.start_update_interval(1)
+        api.set_module_count(config[DOMAIN][CONF_MODULE_COUNT])
     except ConnectionError:
         _LOGGER.error("Unable to connect: %s", ConnectionError)
         return False
@@ -66,9 +67,9 @@ async def async_setup(
     async def handle_search_modules(call: ServiceCall):
         await api.search_modules(config[DOMAIN][CONF_MODULE_COUNT])
 
-    hass.services.async_register(DOMAIN, "reset", handle_reset)
-    hass.services.async_register(DOMAIN, "gryf_expert", handle_gryf_expert)
-    hass.services.async_register(DOMAIN, "search_modules", handle_search_modules)
+    hass.services.async_register(DOMAIN, "yaml_reset", handle_reset)
+    hass.services.async_register(DOMAIN, "yaml_gryf_expert", handle_gryf_expert)
+    hass.services.async_register(DOMAIN, "yaml_search_modules", handle_search_modules)
 
     for PLATFORM in HOMEASSISTANT_PLATFORMS:
         await async_load_platform(hass , PLATFORM , DOMAIN , None , config)

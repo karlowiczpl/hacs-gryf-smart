@@ -67,6 +67,7 @@ CONFIG_SCHEMA = vol.Schema(
                 vol.Optional(Platforms.CLIMATE): vol.All(cv.ensure_list , [CLIMATE_SCHEMA]),
                 vol.Optional(Platforms.COVER): vol.All(cv.ensure_list , [COVER_SCHEMA]),
                 vol.Optional(Platforms.GATE): vol.All(cv.ensure_list , [GATE_SCHEMA]),
+                vol.Optional(Platforms.TEMPERATURE): vol.All(cv.ensure_list , [STANDARD_SCHEMA]),
             }
         )
     },

@@ -61,6 +61,7 @@ async def async_setup_platform(
     )
 
     inputs = []
+    termometers = []
 
     for conf in hass.data[DOMAIN].get(Platforms.INPUT, {}):
         device = GryfInput(
@@ -71,7 +72,17 @@ async def async_setup_platform(
         )
         inputs.append(GryfYamlInput(device))
 
+    for conf in hass.data[DOMAIN].get(Platforms.TEMPERATURE, {}):
+        device = GryfTemperature(
+            conf.get(CONF_NAME),
+            conf.get(CONF_ID) // 10,
+            conf.get(CONF_ID) % 10,
+            hass.data[DOMAIN][CONF_API],
+        )
+        termometers.append(GryfYamlTemperature(device))
+
     async_add_entities(inputs)
+    async_add_entities(termometers)
 
 async def async_setup_entry(
     hass: HomeAssistant,
