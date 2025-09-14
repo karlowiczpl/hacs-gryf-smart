@@ -176,7 +176,7 @@ class GryfPwmBase(LightEntity):
     async def async_update(self, brightness):
         """Update state."""
 
-        self._is_on = bool(brightness)
+        self._is_on = bool(int(brightness))
         self._brightness = value_to_brightness((0, 100), int(brightness))
         self.async_write_ha_state()
 
