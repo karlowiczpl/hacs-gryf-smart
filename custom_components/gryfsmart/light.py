@@ -161,6 +161,7 @@ class GryfPwmBase(LightEntity):
     _device: _GryfDevice
     _attr_color_mode = ColorMode.BRIGHTNESS
     _attr_supported_color_modes = {ColorMode.BRIGHTNESS}
+    _last_brightness = 0
 
     @property
     def brightness(self) -> int | None:
@@ -186,13 +187,16 @@ class GryfPwmBase(LightEntity):
         if brightness is not None:
             percentage_brightness = int(brightness_to_value((0, 100), brightness))
             await self._device.set_level(percentage_brightness)
+
+            if brightness:
+                self._last_brightness = brightness
         else:
-            await self._device.turn_on()
+            await self._device.set_level(self._last_brightness)
 
     async def async_turn_off(self, **kwargs: Any) -> None:
         """Turn pwm off."""
 
-        await self._device.turn_off()
+        await self._device.set_level(0)
 
 
 class GryfConfigFlowPwm(GryfConfigFlowEntity, GryfPwmBase):
