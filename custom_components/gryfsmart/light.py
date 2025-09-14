@@ -11,6 +11,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
 from homeassistant.helpers.restore_state import RestoreEntity
+from homeassistant.util.color import value_to_brightness, brightness_to_value
 
 from .entity import GryfConfigFlowEntity, GryfYamlEntity
 from .const import (
@@ -152,7 +153,6 @@ class GryfYamlLight(GryfYamlEntity, GryfLightBase):
         super().__init__(device)
         device.subscribe(self.async_update)
 
-
 class GryfPwmBase(LightEntity):
     """Gryf Pwm entity base."""
 
@@ -177,17 +177,17 @@ class GryfPwmBase(LightEntity):
         """Update state."""
 
         self._is_on = bool(brightness)
-        self._brightness = brightness
+        self._brightness = value_to_brightness((0, 100), brightness)
         self.async_write_ha_state()
 
     async def async_turn_on(self, **kwargs: Any) -> None:
         """Turn pwm on."""
         brightness = kwargs.get("brightness")
         if brightness is not None:
-            percentage_brightness = int((brightness / 255) * 100)
+            percentage_brightness = int(brightness_to_value((0, 100), brightness))
             await self._device.set_level(percentage_brightness)
-
-        await self._device.turn_on()
+        else:
+            await self._device.turn_on()
 
     async def async_turn_off(self, **kwargs: Any) -> None:
         """Turn pwm off."""

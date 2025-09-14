@@ -27,9 +27,6 @@ from .const import (
     THE_SLOWEST_HEATING_MODE,
     Platforms
 )
-import logging
-
-_LOGGER = logging.getLogger(__name__)
 
 async def async_setup_platform(
     hass: HomeAssistant,
@@ -114,7 +111,6 @@ class GryfClimteBase(ClimateEntity):
         """Update state."""
 
         self._current_temperature = states.get("T")
-        _LOGGER.error(self.current_temperature)
 
         if states.get("O"):
             self._attr_hvac_action = HVACAction.HEATING
