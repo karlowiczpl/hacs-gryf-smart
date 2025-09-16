@@ -2,7 +2,7 @@
 
 from pygryfsmart.device import GryfCover
 
-from homeassistant.components.cover import CoverEntity, CoverDeviceClass, CoverEntityFeature
+from homeassistant.components.cover import CoverEntity, CoverDeviceClass, CoverEntityFeature, CoverState
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_TYPE
 from homeassistant.core import HomeAssistant
@@ -67,6 +67,7 @@ class GryfCoverBase(CoverEntity):
     """Gryf Cover entity base."""
 
     _device: GryfCover
+    _wait_for_stop = False
     _attr_is_closed = False
     _attr_is_opening = False
     _attr_is_closing = False
@@ -86,13 +87,15 @@ class GryfCoverBase(CoverEntity):
         if state == 1:
             self._attr_is_opening = True
             self._attr_is_closing = False
+            self._wait_for_stop = 1
         elif state == 2:
             self._attr_is_opening = False
             self._attr_is_closing = True
+            self._wait_for_stop = 1
         else:
-            if self._attr_is_opening:
+            if self._attr_is_opening and self._wait_for_stop:
                 self._attr_is_closed = False
-            else:
+            elif self._wait_for_stop:
                 self._attr_is_closed = True
 
             self._attr_is_opening = False
