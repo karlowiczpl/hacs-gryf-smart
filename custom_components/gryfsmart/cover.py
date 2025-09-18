@@ -1,6 +1,7 @@
 """Handle the Gryf Smart Cover platform funtionality."""
 
 from pygryfsmart.device import GryfCover
+from pygryfsmart.const import ShutterStates
 
 from homeassistant.components.cover import CoverEntity, CoverDeviceClass, CoverEntityFeature, CoverState
 from homeassistant.config_entries import ConfigEntry
@@ -68,11 +69,13 @@ class GryfCoverBase(CoverEntity):
 
     _device: GryfCover
     _wait_for_stop = False
+    _trying_to_stop = False
     _attr_is_closed = False
     _attr_is_opening = False
     _attr_is_closing = False
     _attr_device_class = CoverDeviceClass.SHUTTER
-    _attr_supported_features = CoverEntityFeature.OPEN | CoverEntityFeature.CLOSE | CoverEntityFeature.OPEN_TILT | CoverEntityFeature.STOP
+    _attr_supported_features = CoverEntityFeature.OPEN | CoverEntityFeature.CLOSE | CoverEntityFeature.OPEN_TILT | CoverEntityFeature.STOP | CoverEntityFeature.CLOSE_TILT
+    _attr_state = CoverState.CLOSED
 
     async def async_open_cover(self, **kwargs):
         await self._device.turn_on()
@@ -80,8 +83,19 @@ class GryfCoverBase(CoverEntity):
     async def async_close_cover(self, **kwargs):
         await self._device.turn_off()
 
+    async def async_stop_cover(self, **kwargs):
+        self._trying_to_stop = True
+
+        await self._device.stop()
+
     async def async_open_cover_tilt(self, **kwargs):
+        if self._attr_state in [CoverState.OPENING, CoverState.CLOSING]:
+            self._trying_to_stop = True
+
         await self._device.toggle()
+
+    async def async_close_cover_tilt(self, **kwargs):
+        await self._device._api.set_cover(self._device._id, self._device._pin, 25, ShutterStates.OPEN)
 
     async def async_update(self, state):
         if state == 1:
@@ -97,11 +111,13 @@ class GryfCoverBase(CoverEntity):
                 self._attr_is_closed = False
             elif self._wait_for_stop:
                 self._attr_is_closed = True
-
+            if self._trying_to_stop:
+                self._trying_to_stop = True
+                self._attr_is_closed = None
             self._attr_is_opening = False
             self._attr_is_closing = False
             
-            self.async_write_ha_state()
+        self.async_write_ha_state()
 
 class GryfYamlCover(GryfYamlEntity, GryfCoverBase):
 
