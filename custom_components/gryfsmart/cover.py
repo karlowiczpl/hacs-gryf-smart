@@ -22,6 +22,9 @@ from .const import (
     Platforms,
 )
 
+import logging
+_LOGGER = logging.getLogger(__name__)
+
 async def async_setup_platform(
     hass: HomeAssistant,
     config: ConfigType,
@@ -73,8 +76,9 @@ class GryfCoverBase(CoverEntity):
     _attr_is_closed = False
     _attr_is_opening = False
     _attr_is_closing = False
+    _attr_current_cover_tilt_position = 0
     _attr_device_class = CoverDeviceClass.SHUTTER
-    _attr_supported_features = CoverEntityFeature.OPEN | CoverEntityFeature.CLOSE | CoverEntityFeature.OPEN_TILT | CoverEntityFeature.STOP | CoverEntityFeature.CLOSE_TILT
+    _attr_supported_features = CoverEntityFeature.OPEN | CoverEntityFeature.CLOSE | CoverEntityFeature.OPEN_TILT | CoverEntityFeature.STOP | CoverEntityFeature.CLOSE_TILT | CoverEntityFeature.SET_TILT_POSTION
     _attr_state = CoverState.CLOSED
 
     async def async_open_cover(self, **kwargs):
@@ -87,6 +91,9 @@ class GryfCoverBase(CoverEntity):
         self._trying_to_stop = True
 
         await self._device.stop()
+
+    async def async_set_cover_tilt_position(self, **kwargs):
+        _LOGGER.debug(kwargs)
 
     async def async_open_cover_tilt(self, **kwargs):
         if self._attr_state in [CoverState.OPENING, CoverState.CLOSING]:
