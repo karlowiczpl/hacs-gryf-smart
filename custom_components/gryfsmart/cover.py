@@ -78,7 +78,8 @@ class GryfCoverBase(CoverEntity):
     _attr_is_closing = False
     _attr_current_cover_tilt_position = 0
     _attr_device_class = CoverDeviceClass.SHUTTER
-    _attr_supported_features = CoverEntityFeature.OPEN | CoverEntityFeature.CLOSE | CoverEntityFeature.OPEN_TILT | CoverEntityFeature.STOP | CoverEntityFeature.CLOSE_TILT | CoverEntityFeature.SET_TILT_POSTION
+    _attr_current_cover_tilt_position = 0
+    _attr_supported_features = CoverEntityFeature.OPEN | CoverEntityFeature.CLOSE | CoverEntityFeature.OPEN_TILT | CoverEntityFeature.STOP | CoverEntityFeature.CLOSE_TILT | CoverEntityFeature.SET_TILT_POSITION
     _attr_state = CoverState.CLOSED
 
     async def async_open_cover(self, **kwargs):
@@ -109,10 +110,12 @@ class GryfCoverBase(CoverEntity):
             self._attr_is_opening = True
             self._attr_is_closing = False
             self._wait_for_stop = 1
+            self._attr_current_cover_tilt_position = 100
         elif state == 2:
             self._attr_is_opening = False
             self._attr_is_closing = True
             self._wait_for_stop = 1
+            self._attr_current_cover_tilt_position = 0
         else:
             if self._attr_is_opening and self._wait_for_stop:
                 self._attr_is_closed = False
