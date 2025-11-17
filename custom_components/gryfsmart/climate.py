@@ -11,6 +11,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
 from homeassistant.components.climate.const import HVACAction, HVACMode
+from homeassistant.helpers.restore_state import RestoreEntity
 
 from .entity import GryfYamlEntity, GryfConfigFlowEntity
 from .const import (
@@ -72,7 +73,7 @@ async def async_setup_entry(
 
     async_add_entities(climates)
 
-class GryfClimteBase(ClimateEntity):
+class GryfClimteBase(ClimateEntity , RestoreEntity):
     """Gryf Climte entity base."""
 
     _attr_supported_features = (
@@ -102,6 +103,16 @@ class GryfClimteBase(ClimateEntity):
     _attr_target_temperature = 21.0
 
     _device: _GryfDevice
+
+    async def async_added_to_hass(self):
+        await super().async_added_to_hass()
+        if (last_state := await self.async_get_last_state()) is not None:
+            
+            self._target_temperature = last_state.attributes.get(ATTR_TEMPERATURE, 21.0)
+            self._hvac_mode = last_state.state if last_state.state in self.hvac_modes else HVACMode.OFF
+            self._hvac_action = last_state.attributes.get("hvac_action", HVACAction.OFF)
+
+        self.async_write_ha_state()
 
     @property
     def current_temperature(self):

@@ -82,6 +82,15 @@ class GryfCoverBase(CoverEntity):
     _attr_supported_features = CoverEntityFeature.OPEN | CoverEntityFeature.CLOSE | CoverEntityFeature.OPEN_TILT | CoverEntityFeature.STOP | CoverEntityFeature.CLOSE_TILT | CoverEntityFeature.SET_TILT_POSITION | CoverEntityFeature.SET_POSITION
     _attr_state = CoverState.CLOSED
 
+    async def async_added_to_hass(self):
+        await super().async_added_to_hass()
+        if (last_state := await self.async_get_last_state()) is not None:
+            # self._a_position = last_state.attributes.get("position", self._attr_position)
+            self._attr_state = last_state.state if last_state.state in [CoverState.OPEN, CoverState.CLOSE, CoverState.OPENING, CoverState.CLOSING] else self._attr_state
+            self._attr_is_opening = last_state.attributes.get("is_opening", self._is_opening)
+            self._attr_is_closing = last_state.attributes.get("is_closing", self._is_closing)
+            self.async_write_ha_state()
+
     async def async_open_cover(self, **kwargs):
         await self._device.turn_on()
 
