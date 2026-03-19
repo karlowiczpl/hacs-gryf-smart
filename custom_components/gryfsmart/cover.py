@@ -1,6 +1,6 @@
 """Handle the Gryf Smart Cover platform funtionality."""
 
-from pygryfsmart.device import GryfCover
+from pygryfsmart.device import GryfCover, GryfPercentCover
 from pygryfsmart.const import ShutterStates
 
 from homeassistant.components.cover import CoverEntity, CoverDeviceClass, CoverEntityFeature, CoverState
@@ -23,6 +23,8 @@ from .const import (
 )
 
 import logging
+import asyncio
+
 _LOGGER = logging.getLogger(__name__)
 
 async def async_setup_platform(
@@ -36,7 +38,7 @@ async def async_setup_platform(
     covers = []
 
     for conf in hass.data[DOMAIN].get(Platforms.COVER, {}):
-        device = GryfCover(
+        device = GryfPercentCover(
             conf.get(CONF_NAME),
             conf.get(CONF_ID) // 10,
             conf.get(CONF_ID) % 10,
@@ -56,7 +58,7 @@ async def async_setup_entry(
     covers = []
     for conf in config_entry.data[CONF_DEVICES]:
         if conf.get(CONF_TYPE) == Platforms.COVER:
-            device = GryfCover(
+            device = GryfPercentCover(
                 conf.get(CONF_NAME),
                 conf.get(CONF_ID) // 10,
                 conf.get(CONF_ID) % 10,
@@ -76,20 +78,20 @@ class GryfCoverBase(CoverEntity):
     _attr_is_closed = False
     _attr_is_opening = False
     _attr_is_closing = False
+    _attr_current_cover_position = 100
+    _position: int=0
     _attr_current_cover_tilt_position = 0
     _attr_device_class = CoverDeviceClass.SHUTTER
-    _attr_current_cover_tilt_position = 0
     _attr_supported_features = CoverEntityFeature.OPEN | CoverEntityFeature.CLOSE | CoverEntityFeature.OPEN_TILT | CoverEntityFeature.STOP | CoverEntityFeature.CLOSE_TILT | CoverEntityFeature.SET_TILT_POSITION | CoverEntityFeature.SET_POSITION
     _attr_state = CoverState.CLOSED
+    _tilt_position: int=0
 
-    # async def async_added_to_hass(self):
-    #     await super().async_added_to_hass()
-    #     if (last_state := await self.async_get_last_state()) is not None:
-    #         # self._a_position = last_state.attributes.get("position", self._attr_position)
-    #         self._attr_state = last_state.state if last_state.state in [CoverState.OPEN, CoverState.CLOSE, CoverState.OPENING, CoverState.CLOSING] else self._attr_state
-    #         self._attr_is_opening = last_state.attributes.get("is_opening", self._is_opening)
-    #         self._attr_is_closing = last_state.attributes.get("is_closing", self._is_closing)
-    #         self.async_write_ha_state()
+    async def async_added_to_hass(self):
+        self._device._timer.set_secound_timer_callback(self.update_cover_position)
+
+        self._device.set_tilt_position_callback_ptr(self.update_cover_tilt_position)
+        self._device.set_tilt_opening_time(30)
+        self._device.load_last_shutter_position(100)
 
     async def async_open_cover(self, **kwargs):
         await self._device.turn_on()
@@ -103,10 +105,15 @@ class GryfCoverBase(CoverEntity):
         await self._device.stop()
 
     async def async_set_cover_tilt_position(self, **kwargs):
-        _LOGGER.debug(kwargs)
+        tilt_position = kwargs.get("tilt_position", 0)
 
-    async def async_set_position(self, **kwargs):
-        _LOGGER.debug(kwargs)
+        await self._device.set_cover_tilt_position(tilt_position)       
+        self._tilt_position = tilt_position
+
+    async def async_set_cover_position(self, **kwargs):
+        self._position = kwargs.get("position", 0)
+
+        await self._device.set_cover_position(self._position)
 
     async def async_open_cover_tilt(self, **kwargs):
         if self._attr_state in [CoverState.OPENING, CoverState.CLOSING]:
@@ -116,6 +123,16 @@ class GryfCoverBase(CoverEntity):
 
     async def async_close_cover_tilt(self, **kwargs):
         await self._device._api.set_cover(self._device._id, self._device._pin, 25, ShutterStates.OPEN)
+
+    async def update_cover_position(self, position):
+        self._attr_current_cover_position = int(position)
+
+        self.async_write_ha_state()
+
+    async def update_cover_tilt_position(self, position):
+        self._attr_current_cover_tilt_position = int(position)
+
+        self.async_write_ha_state()
 
     async def async_update(self, state):
         if state == 1:
@@ -138,6 +155,9 @@ class GryfCoverBase(CoverEntity):
                 self._attr_is_closed = None
             self._attr_is_opening = False
             self._attr_is_closing = False
+
+            if self._device.tilt_is_waiting_to_set and not(self._attr_is_opening or self._attr_is_closing):
+                await self.async_set_cover_tilt_position(tilt_position=self._tilt_position)
             
         self.async_write_ha_state()
 
