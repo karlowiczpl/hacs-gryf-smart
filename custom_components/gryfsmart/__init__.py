@@ -36,10 +36,13 @@ async def async_setup(
         return True
 
     try:
-        api = GryfApi(config[DOMAIN][CONF_PORT])
-        await api.start_connection()
-        api.start_update_interval(1)
-        api.set_module_count(config[DOMAIN][CONF_MODULE_COUNT])
+        port = config[DOMAIN][CONF_PORT]
+        module_count = config[DOMAIN][CONF_MODULE_COUNT]
+
+        api = await hass.async_add_executor_job(GryfApi, port)
+        await hass.async_add_executor_job(api.start_connection)
+        await hass.async_add_executor_job(api.start_update_interval, 1)
+        await hass.async_add_executor_job(api.set_module_count, module_count)
     except ConnectionError:
         _LOGGER.error("Unable to connect: %s", ConnectionError)
         return False
@@ -90,11 +93,13 @@ async def async_setup_entry(
 
     else:
         try:
-            api = GryfApi(entry.data[CONF_COMMUNICATION][CONF_PORT])
-            await api.start_connection()
+            port = entry.data[CONF_COMMUNICATION][CONF_PORT]
+            module_count = entry.data[CONF_COMMUNICATION][CONF_MODULE_COUNT]
 
-            api.set_module_count(entry.data[CONF_COMMUNICATION][CONF_MODULE_COUNT])
-            api.start_update_interval(api._module_count)
+            api = await hass.async_add_executor_job(GryfApi, port)
+            await hass.async_add_executor_job(api.start_connection)
+            await hass.async_add_executor_job(api.start_update_interval, 1)
+            await hass.async_add_executor_job(api.set_module_count, module_count)
 
         except ConnectionError:
             raise ConfigEntryNotReady("Unable to connect with device") from ConnectionError
